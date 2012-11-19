@@ -9,9 +9,9 @@ public class StaticObject
 	private int id;
 	private String name;
 	private String tag;
-	private double[] rotation;
-	private double[] scale;
-	private double[] worldPos;
+	private double[] rotation = { 0, 0, 0 };
+	private double[] scale = { 1, 1, 1 };
+	private double[] worldPos = { 0, 0, 0 };
 
 	public StaticObject()
 	{
@@ -31,6 +31,22 @@ public class StaticObject
 	public double getMaxZ()
 	{
 		return 0;
+	}
+
+	public String toString()
+	{
+		String s = "<StaticObject ";
+		s += "CastShadows=\"" + castShadows + "\" ";
+		s += "Collides=\"" + collides + "\" ";
+		s += "FileIndex=\"" + fileIndex + "\" ";
+		s += "Group=\"" + group + "\" ";
+		s += "ID=\"" + id + "\" ";
+		s += "Name=\"" + (name != null ? name : "") + "\" ";
+		s += "Rotation=\"" + rotation[0] + " " + rotation[1] + " " + rotation[2] + "\" ";
+		s += "Scale=\"" + scale[0] + " " + scale[1] + " " + scale[2] + "\" ";
+		s += "Tag=\"" + (tag != null ? tag : "") + "\" ";
+		s += "WorldPos=\"" + worldPos[0] + " " + worldPos[1] + " " + worldPos[2] + "\" />";
+		return s;
 	}
 
 }
