@@ -12,19 +12,98 @@ public class ViewportConfig
 	private double gridSnapSeparation = 0.25;
 	private int selectedViewport = 0;
 	private boolean usingEnlargedViewport = true;
-	
+
 	private List<Viewport> viewports;
-	
+
 	public ViewportConfig()
 	{
 		viewports = new ArrayList<Viewport>();
-		for (int i = 0; i < 4; i++) viewports.add(new Viewport());
 	}
-	
+
+	public double[] getBgColor()
+	{
+		return bgColor;
+	}
+
+	public void setBgColor(double[] bgColor)
+	{
+		this.bgColor = bgColor;
+	}
+
+	public boolean isgAmbientLight()
+	{
+		return gAmbientLight;
+	}
+
+	public void setgAmbientLight(boolean gAmbientLight)
+	{
+		this.gAmbientLight = gAmbientLight;
+	}
+
+	public boolean isgPointLight()
+	{
+		return gPointLight;
+	}
+
+	public void setgPointLight(boolean gPointLight)
+	{
+		this.gPointLight = gPointLight;
+	}
+
+	public boolean isGridSnap()
+	{
+		return gridSnap;
+	}
+
+	public void setGridSnap(boolean gridSnap)
+	{
+		this.gridSnap = gridSnap;
+	}
+
+	public double getGridSnapSeparation()
+	{
+		return gridSnapSeparation;
+	}
+
+	public void setGridSnapSeparation(double gridSnapSeparation)
+	{
+		this.gridSnapSeparation = gridSnapSeparation;
+	}
+
+	public int getSelectedViewport()
+	{
+		return selectedViewport;
+	}
+
+	public void setSelectedViewport(int selectedViewport)
+	{
+		this.selectedViewport = selectedViewport;
+	}
+
+	public boolean isUsingEnlargedViewport()
+	{
+		return usingEnlargedViewport;
+	}
+
+	public void setUsingEnlargedViewport(boolean usingEnlargedViewport)
+	{
+		this.usingEnlargedViewport = usingEnlargedViewport;
+	}
+
+	public List<Viewport> getViewports()
+	{
+		return viewports;
+	}
+
+	public void setViewports(List<Viewport> viewports)
+	{
+		this.viewports = viewports;
+	}
+
 	public String toString()
 	{
 		String s = "<ViewportConfig ";
-		s += "BGColor=\"" + bgColor[0] + " " + bgColor[1] + " " + bgColor[2] + " " +  bgColor[3] + "\" ";
+		s += "BGColor=\"" + bgColor[0] + " " + bgColor[1] + " " + bgColor[2] + " " + bgColor[3] + "\" ";
 		s += "GAmbientLight=\"" + gAmbientLight + "\" ";
 		s += "GPointLight=\"" + gPointLight + "\" ";
 		s += "GridSnap=\"" + gridSnap + "\" ";
