@@ -16,9 +16,9 @@ public class StaticObject
 	private int id;
 	private String name;
 	private String tag = "";
-	private double[] rotation = { 0, 0, 0 };
-	private double[] scale = { 1, 1, 1 };
-	private double[] worldPos = { 0, 0, 0 };
+	private float[] rotation = { 0, 0, 0 };
+	private float[] scale = { 1, 1, 1 };
+	private float[] worldPos = { 0, 0, 0 };
 	private String filePath;
 
 	private List<float[]> vertexList;
@@ -26,6 +26,19 @@ public class StaticObject
 	public StaticObject()
 	{
 		// TODO Auto-generated constructor stub
+	}
+	
+	public StaticObject(StaticObject obj)
+	{
+		this.castShadows = obj.castShadows;
+		this.collides = obj.collides;
+		this.fileIndex = obj.fileIndex;
+		this.group = obj.group;
+		this.tag = obj.tag;
+		this.rotation = obj.rotation.clone();
+		this.scale = obj.scale.clone();
+		this.worldPos = obj.worldPos.clone();
+		this.filePath = obj.filePath;
 	}
 
 	public StaticObject(String filePath)
@@ -91,15 +104,117 @@ public class StaticObject
 
 	public float getMaxY()
 	{
-		return 0;
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMax = 0;
+		for (float[] xs : vertexList)
+		{
+			if (xs[1] > currentMax)
+			{
+				currentMax = xs[1];
+			}
+		}
+		return currentMax;
 	}
-
+	
+	public float getMinY()
+	{
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMin = Float.MAX_VALUE;
+		for (float[] xs : vertexList)
+		{
+			if (xs[1] < currentMin)
+			{
+				currentMin = xs[1];
+			}
+		}
+		return currentMin;
+	}
+	
 	public float getMaxZ()
 	{
-		return 0;
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMax = 0;
+		for (float[] xs : vertexList)
+		{
+			if (xs[2] > currentMax)
+			{
+				currentMax = xs[2];
+			}
+		}
+		return currentMax;
+	}
+	
+	public float getMinZ()
+	{
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMin = Float.MAX_VALUE;
+		for (float[] xs : vertexList)
+		{
+			if (xs[2] < currentMin)
+			{
+				currentMin = xs[2];
+			}
+		}
+		return currentMin;
 	}
 
-	public boolean isCastShadows()
+	public boolean doesCastShadows()
 	{
 		return castShadows;
 	}
@@ -109,7 +224,7 @@ public class StaticObject
 		this.castShadows = castShadows;
 	}
 
-	public boolean isCollides()
+	public boolean doesCollides()
 	{
 		return collides;
 	}
@@ -169,32 +284,32 @@ public class StaticObject
 		this.tag = tag;
 	}
 
-	public double[] getRotation()
+	public float[] getRotation()
 	{
 		return rotation;
 	}
 
-	public void setRotation(double[] rotation)
+	public void setRotation(float[] rotation)
 	{
 		this.rotation = rotation;
 	}
 
-	public double[] getScale()
+	public float[] getScale()
 	{
 		return scale;
 	}
 
-	public void setScale(double[] scale)
+	public void setScale(float[] scale)
 	{
 		this.scale = scale;
 	}
 
-	public double[] getWorldPos()
+	public float[] getWorldPos()
 	{
 		return worldPos;
 	}
 
-	public void setWorldPos(double[] worldPos)
+	public void setWorldPos(float[] worldPos)
 	{
 		this.worldPos = worldPos;
 	}

@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Random;
+import java.util.List;
 
 public class HPL2Map
 {
@@ -61,17 +61,15 @@ public class HPL2Map
 		HPL2Map map = new HPL2Map();
 
 		StaticObject s = new StaticObject("static_objects/mansionbase/wall/default.dae");
-		Random r = new Random();
-		s.setWorldPos(new double[] { 0, 0, 0 });
-		s.setRotation(new double[] { 0, 0, 0 });
-		map.mapData.addStaticObject(s);
 
-		for (int i = 0; i < 6; i++)
+		TessellatedWall corridor = new TessellatedWall(s);
+		corridor.setWorldPos(new float[] { 0, 0, 0 });
+		corridor.setWidth(50);
+		List<StaticObject> objs = corridor.calculateObjects();
+
+		for (StaticObject o : objs)
 		{
-		StaticObject t = new StaticObject("static_objects/mansionbase/wall/default.dae");
-		t.setWorldPos(new double[] { map.mapData.getStaticObjects().get(i).getWorldPos()[0] + map.mapData.getStaticObjects().get(i).getMaxX() + Math.abs(t.getMinX()), 0, 0 });
-		t.setRotation(new double[] { 0, 0, 0 });
-		map.mapData.addStaticObject(t);
+			map.mapData.addStaticObject(o);
 		}
 
 		System.out.println(map);
