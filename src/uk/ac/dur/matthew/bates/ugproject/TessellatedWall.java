@@ -19,7 +19,7 @@ public class TessellatedWall
 	{
 		List<StaticObject> list = new ArrayList<StaticObject>();
 		float tileWidth = Math.abs((tileObject.getMinX() - tileObject.getMaxX()));
-		for (int i = 0; i < (int) (width / tileWidth); i++)
+		for (int i = 0; i < width; i++)
 		{
 			StaticObject obj = new StaticObject(tileObject);
 			obj.setWorldPos(new float[] { worldPos[0] + i * tileWidth, worldPos[1], worldPos[2] });

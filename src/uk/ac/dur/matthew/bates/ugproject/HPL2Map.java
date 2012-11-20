@@ -60,11 +60,11 @@ public class HPL2Map
 	{
 		HPL2Map map = new HPL2Map();
 
-		StaticObject s = new StaticObject("static_objects/mansionbase/wall/default.dae");
+		StaticObject s = new StaticObject("static_objects/mansionbase/wall/door_frame.dae");
 
 		TessellatedWall corridor = new TessellatedWall(s);
 		corridor.setWorldPos(new float[] { 0, 0, 0 });
-		corridor.setWidth(50);
+		corridor.setWidth(5);
 		List<StaticObject> objs = corridor.calculateObjects();
 
 		for (StaticObject o : objs)
