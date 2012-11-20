@@ -9,17 +9,6 @@ public class EditorSession
 	private ViewportConfig viewportConfig;
 	private List<Group> groups;
 
-	// GridPlane="2" Preset="0" RenderMode="1" ShowAxes="true" ShowGrid="true" UsingLTCam="true" />
-	// <Viewport CameraPosition="181.102 3.745 10.3607" CameraTarget="1.101 3.745 10.3607"
-	// CameraZoom="0" GridHeight="1.101" GridPlane="0" Preset="1" RenderMode="1" ShowAxes="true"
-	// ShowGrid="true" UsingLTCam="true" />
-	// <Viewport CameraPosition="1.101 183.995 10.3607" CameraTarget="1.101 3.995 10.3607"
-	// CameraZoom="0" GridHeight="3.995" GridPlane="1" Preset="2" RenderMode="1" ShowAxes="true"
-	// ShowGrid="true" UsingLTCam="true" />
-	// <Viewport CameraPosition="-1.77312 8.57924 9.37368" CameraTarget="1.101 3.995 10.3607"
-	// CameraZoom="2.20727" GridHeight="3.995" GridPlane="1" Preset="3" RenderMode="0"
-	// ShowAxes="true" S
-
 	public static EditorSession defaultEditorSession()
 	{
 		EditorSession defaultEditorSession = new EditorSession();
@@ -28,22 +17,36 @@ public class EditorSession
 
 		ViewportConfig viewportConfig = new ViewportConfig();
 		List<Viewport> viewports = viewportConfig.getViewports();
+		
 		Viewport v1 = new Viewport();
 		v1.setPreset(0);
 		v1.setGridPlane(2);
+		v1.setRenderMode(0);
+		v1.setCameraPosition(new double[]{ 0, 0, 180 });
+		
 		viewports.add(v1);
+		
 		Viewport v2 = new Viewport();
 		v2.setPreset(1);
 		v2.setGridPlane(0);
+		v2.setRenderMode(0);
+		v2.setCameraPosition(new double[]{ 180, 0, 0 });
 		viewports.add(v2);
+		
 		Viewport v3 = new Viewport();
 		v3.setPreset(2);
 		v3.setGridPlane(1);
+		v3.setRenderMode(0);
+		v3.setCameraPosition(new double[]{ 0, 180, 0 });
 		viewports.add(v3);
+		
 		Viewport v4 = new Viewport();
 		v4.setPreset(3);
 		v4.setGridPlane(1);
+		v4.setRenderMode(0);
+		v4.setCameraPosition(new double[]{ 3, 3, 3 });
 		viewports.add(v4);
+		
 		defaultEditorSession.viewportConfig = viewportConfig;
 
 		defaultEditorSession.groups.add(new Group());

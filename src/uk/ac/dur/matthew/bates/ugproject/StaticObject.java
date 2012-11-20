@@ -2,20 +2,26 @@ package uk.ac.dur.matthew.bates.ugproject;
 
 public class StaticObject
 {
-	private boolean castShadows;
-	private boolean collides;
+	private boolean castShadows = true;
+	private boolean collides = true;
 	private int fileIndex;
-	private int group;
+	private int group = 0;
 	private int id;
 	private String name;
-	private String tag;
+	private String tag = "";
 	private double[] rotation = { 0, 0, 0 };
 	private double[] scale = { 1, 1, 1 };
 	private double[] worldPos = { 0, 0, 0 };
+	private String filePath;
 
 	public StaticObject()
 	{
 		// TODO Auto-generated constructor stub
+	}
+	
+	public StaticObject(String filePath)
+	{
+		this.filePath = filePath;
 	}
 
 	public double getMaxX()
@@ -31,6 +37,116 @@ public class StaticObject
 	public double getMaxZ()
 	{
 		return 0;
+	}
+
+	public boolean isCastShadows()
+	{
+		return castShadows;
+	}
+
+	public void setCastShadows(boolean castShadows)
+	{
+		this.castShadows = castShadows;
+	}
+
+	public boolean isCollides()
+	{
+		return collides;
+	}
+
+	public void setCollides(boolean collides)
+	{
+		this.collides = collides;
+	}
+
+	public int getFileIndex()
+	{
+		return fileIndex;
+	}
+
+	public void setFileIndex(int fileIndex)
+	{
+		this.fileIndex = fileIndex;
+	}
+
+	public int getGroup()
+	{
+		return group;
+	}
+
+	public void setGroup(int group)
+	{
+		this.group = group;
+	}
+
+	public int getId()
+	{
+		return id;
+	}
+
+	public void setId(int id)
+	{
+		this.id = id;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getTag()
+	{
+		return tag;
+	}
+
+	public void setTag(String tag)
+	{
+		this.tag = tag;
+	}
+
+	public double[] getRotation()
+	{
+		return rotation;
+	}
+
+	public void setRotation(double[] rotation)
+	{
+		this.rotation = rotation;
+	}
+
+	public double[] getScale()
+	{
+		return scale;
+	}
+
+	public void setScale(double[] scale)
+	{
+		this.scale = scale;
+	}
+
+	public double[] getWorldPos()
+	{
+		return worldPos;
+	}
+
+	public void setWorldPos(double[] worldPos)
+	{
+		this.worldPos = worldPos;
+	}
+
+	public String getFilePath()
+	{
+		return filePath;
+	}
+
+	public void setFilePath(String filePath)
+	{
+		this.filePath = filePath;
 	}
 
 	public String toString()

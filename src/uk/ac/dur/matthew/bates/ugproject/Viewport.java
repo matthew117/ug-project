@@ -2,10 +2,10 @@ package uk.ac.dur.matthew.bates.ugproject;
 
 public class Viewport
 {
-	private double[] cameraPosition = { 1, 4, 190 };
-	private double[] cameraTarget = { 1, 4, 10 };
+	private double[] cameraPosition = { 0, 0, 0 };
+	private double[] cameraTarget = { 0, 0, 0 };
 	private double cameraZoom = 0;
-	private double gridHeight = 10;
+	private double gridHeight = 0;
 	private int gridPlane = 0;
 	private int preset = 0;
 	private int renderMode = 1;

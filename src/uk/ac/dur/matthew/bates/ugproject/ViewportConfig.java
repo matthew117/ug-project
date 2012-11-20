@@ -11,7 +11,7 @@ public class ViewportConfig
 	private boolean gridSnap = true;
 	private double gridSnapSeparation = 0.25;
 	private int selectedViewport = 0;
-	private boolean usingEnlargedViewport = true;
+	private boolean usingEnlargedViewport = false;
 
 	private List<Viewport> viewports;
 

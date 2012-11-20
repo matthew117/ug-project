@@ -1,9 +1,8 @@
 package uk.ac.dur.matthew.bates.ugproject;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MapData
 {
@@ -14,10 +13,10 @@ public class MapData
 	private static int nextID = 0;
 
 	// fields
-	private Map<Integer, String> fileIndexStaticObjects;
-	private Map<Integer, String> fileIndexEntities;
-	private Map<Integer, String> fileIndexDecals;
-	
+	private ArrayList<String> fileIndexStaticObjects;
+	private ArrayList<String> fileIndexEntities;
+	private ArrayList<String> fileIndexDecals;
+
 	private List<StaticObject> staticObjects;
 	private List<Primitive> primitives;
 	private List<Decal> decals;
@@ -38,24 +37,46 @@ public class MapData
 	public MapData()
 	{
 		// TODO Auto-generated constructor stub
-		fileIndexStaticObjects = new HashMap<Integer, String>();
-		fileIndexEntities = new HashMap<Integer, String>();
-		fileIndexDecals = new HashMap<Integer, String>();
-		
+		fileIndexStaticObjects = new ArrayList<String>();
+		fileIndexEntities = new ArrayList<String>();
+		fileIndexDecals = new ArrayList<String>();
+
 		staticObjects = new ArrayList<StaticObject>();
 		primitives = new ArrayList<Primitive>();
 		decals = new ArrayList<Decal>();
 		entities = new ArrayList<Entity>();
 	}
 
-	public static StaticObject createStaticObject(String filePath)
+	public int addStaticObject(StaticObject obj)
 	{
-		return null;
-	}
+		String filePath = obj.getFilePath();
+		
+		if (fileIndexStaticObjects.contains(obj.getFilePath()))
+		{
+			obj.setFileIndex(fileIndexStaticObjects.indexOf(filePath));
+		}
+		else
+		{
+			obj.setFileIndex(fileIndexStaticObjects.size());
+			fileIndexStaticObjects.add(filePath);
+		}
+		obj.setId(nextID++);
 
-	public static StaticObject createStaticObject(String filePath, int group)
-	{
-		return null;
+		String[] expPath = filePath.split("" + File.separatorChar);
+		String fileName = expPath[expPath.length - 1].split("\\.")[0];
+
+		int n = 1;
+		for (StaticObject s : staticObjects)
+		{
+			if (s.getFileIndex() == obj.getFileIndex()) n++;
+		}
+		fileName += "_" + n;
+		
+		obj.setName(fileName);
+
+		staticObjects.add(obj);
+
+		return obj.getId();
 	}
 
 	public String toString()
@@ -80,7 +101,7 @@ public class MapData
 		else
 		{
 			s += "\n        <FileIndex_StaticObjects NumOfFiles=\"" + fileIndexStaticObjects.size() + "\">";
-			for (Integer fileID : fileIndexStaticObjects.keySet())
+			for (int fileID = 0; fileID < fileIndexStaticObjects.size(); fileID++)
 			{
 				s += "\n            <File Id=\"" + fileID + "\" Path=\"";
 				s += fileIndexStaticObjects.get(fileID) + "\" />";
@@ -94,7 +115,7 @@ public class MapData
 		else
 		{
 			s += "\n        <FileIndex_Entities NumOfFiles=\"" + fileIndexEntities.size() + "\">";
-			for (Integer fileID : fileIndexEntities.keySet())
+			for (int fileID = 0; fileID < fileIndexEntities.size(); fileID++)
 			{
 				s += "\n            <File Id=\"" + fileID + "\" Path=\"";
 				s += fileIndexEntities.get(fileID) + "\" />";
@@ -108,7 +129,7 @@ public class MapData
 		else
 		{
 			s += "\n        <FileIndex_Decals NumOfFiles=\"" + fileIndexDecals.size() + "\">";
-			for (Integer fileID : fileIndexDecals.keySet())
+			for (int fileID = 0; fileID < fileIndexDecals.size(); fileID++)
 			{
 				s += "\n            <File Id=\"" + fileID + "\" Path=\"";
 				s += fileIndexDecals.get(fileID) + "\" />";
@@ -116,8 +137,8 @@ public class MapData
 			s += "\n        </FileIndex_Decals>";
 		}
 		if (staticObjects.size() == 0)
-		{	
-			s += "\n        <StaticObjects />";	
+		{
+			s += "\n        <StaticObjects />";
 		}
 		else
 		{
@@ -126,45 +147,38 @@ public class MapData
 			{
 				s += "\n            " + sObj;
 			}
-			s += "\n        <StaticObjects />";	
+			s += "\n        </StaticObjects>";
 		}
 		if (primitives.size() == 0)
-		{	
-			s += "\n        <Primitives />";	
+		{
+			s += "\n        <Primitives />";
 		}
 		else
 		{
 			s += "\n        <Primitives>";
-			s += "\n        <Primitives />";	
+			s += "\n        </Primitives>";
 		}
 		if (decals.size() == 0)
-		{	
-			s += "\n        <Decals />";	
+		{
+			s += "\n        <Decals />";
 		}
 		else
 		{
 			s += "\n        <Decals>";
-			s += "\n        <Decals />";	
+			s += "\n        </Decals>";
 		}
 		if (entities.size() == 0)
-		{	
-			s += "\n        <Entities />";	
+		{
+			s += "\n        <Entities />";
 		}
 		else
 		{
 			s += "\n        <Entities>";
-			s += "\n        <Entities />";	
+			s += "\n        </Entities>";
 		}
 		s += "\n    </MapContents>";
 		s += "\n</MapData>";
 		return s;
-	}
-
-	public static void main(String[] args)
-	{
-		MapData md = new MapData();
-		md.staticObjects.add(new StaticObject());
-		System.out.println(md);
 	}
 
 }
