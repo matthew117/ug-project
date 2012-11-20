@@ -50,7 +50,7 @@ public class MapData
 	public int addStaticObject(StaticObject obj)
 	{
 		String filePath = obj.getFilePath();
-		
+
 		if (fileIndexStaticObjects.contains(obj.getFilePath()))
 		{
 			obj.setFileIndex(fileIndexStaticObjects.indexOf(filePath));
@@ -71,12 +71,192 @@ public class MapData
 			if (s.getFileIndex() == obj.getFileIndex()) n++;
 		}
 		fileName += "_" + n;
-		
+
 		obj.setName(fileName);
 
 		staticObjects.add(obj);
 
 		return obj.getId();
+	}
+
+	public ArrayList<String> getFileIndexStaticObjects()
+	{
+		return fileIndexStaticObjects;
+	}
+
+	public void setFileIndexStaticObjects(ArrayList<String> fileIndexStaticObjects)
+	{
+		this.fileIndexStaticObjects = fileIndexStaticObjects;
+	}
+
+	public ArrayList<String> getFileIndexEntities()
+	{
+		return fileIndexEntities;
+	}
+
+	public void setFileIndexEntities(ArrayList<String> fileIndexEntities)
+	{
+		this.fileIndexEntities = fileIndexEntities;
+	}
+
+	public ArrayList<String> getFileIndexDecals()
+	{
+		return fileIndexDecals;
+	}
+
+	public void setFileIndexDecals(ArrayList<String> fileIndexDecals)
+	{
+		this.fileIndexDecals = fileIndexDecals;
+	}
+
+	public List<StaticObject> getStaticObjects()
+	{
+		return staticObjects;
+	}
+
+	public void setStaticObjects(List<StaticObject> staticObjects)
+	{
+		this.staticObjects = staticObjects;
+	}
+
+	public List<Primitive> getPrimitives()
+	{
+		return primitives;
+	}
+
+	public void setPrimitives(List<Primitive> primitives)
+	{
+		this.primitives = primitives;
+	}
+
+	public List<Decal> getDecals()
+	{
+		return decals;
+	}
+
+	public void setDecals(List<Decal> decals)
+	{
+		this.decals = decals;
+	}
+
+	public List<Entity> getEntities()
+	{
+		return entities;
+	}
+
+	public void setEntities(List<Entity> entities)
+	{
+		this.entities = entities;
+	}
+
+	public boolean isFogActive()
+	{
+		return fogActive;
+	}
+
+	public void setFogActive(boolean fogActive)
+	{
+		this.fogActive = fogActive;
+	}
+
+	public double[] getFogColor()
+	{
+		return fogColor;
+	}
+
+	public void setFogColor(double[] fogColor)
+	{
+		this.fogColor = fogColor;
+	}
+
+	public boolean isFogCulling()
+	{
+		return fogCulling;
+	}
+
+	public void setFogCulling(boolean fogCulling)
+	{
+		this.fogCulling = fogCulling;
+	}
+
+	public int getFogEnd()
+	{
+		return fogEnd;
+	}
+
+	public void setFogEnd(int fogEnd)
+	{
+		this.fogEnd = fogEnd;
+	}
+
+	public int getFogFallOffExp()
+	{
+		return fogFallOffExp;
+	}
+
+	public void setFogFallOffExp(int fogFallOffExp)
+	{
+		this.fogFallOffExp = fogFallOffExp;
+	}
+
+	public int getFogStart()
+	{
+		return fogStart;
+	}
+
+	public void setFogStart(int fogStart)
+	{
+		this.fogStart = fogStart;
+	}
+
+	public int getGlobalDecalMaxTris()
+	{
+		return globalDecalMaxTris;
+	}
+
+	public void setGlobalDecalMaxTris(int globalDecalMaxTris)
+	{
+		this.globalDecalMaxTris = globalDecalMaxTris;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public boolean isSkyBoxActive()
+	{
+		return skyBoxActive;
+	}
+
+	public void setSkyBoxActive(boolean skyBoxActive)
+	{
+		this.skyBoxActive = skyBoxActive;
+	}
+
+	public double[] getSkyBoxColor()
+	{
+		return skyBoxColor;
+	}
+
+	public void setSkyBoxColor(double[] skyBoxColor)
+	{
+		this.skyBoxColor = skyBoxColor;
+	}
+
+	public String getSkyBoxTexture()
+	{
+		return skyBoxTexture;
+	}
+
+	public void setSkyBoxTexture(String skyBoxTexture)
+	{
+		this.skyBoxTexture = skyBoxTexture;
 	}
 
 	public String toString()

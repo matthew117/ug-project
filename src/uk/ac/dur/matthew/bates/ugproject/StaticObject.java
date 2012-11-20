@@ -1,5 +1,12 @@
 package uk.ac.dur.matthew.bates.ugproject;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 public class StaticObject
 {
 	private boolean castShadows = true;
@@ -14,27 +21,80 @@ public class StaticObject
 	private double[] worldPos = { 0, 0, 0 };
 	private String filePath;
 
+	private List<float[]> vertexList;
+
 	public StaticObject()
 	{
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public StaticObject(String filePath)
 	{
 		this.filePath = filePath;
 	}
 
-	public double getMaxX()
+	public float getMaxX()
+	{
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMax = 0;
+		for (float[] xs : vertexList)
+		{
+			if (xs[0] > currentMax)
+			{
+				currentMax = xs[0];
+			}
+		}
+		return currentMax;
+	}
+	
+	public float getMinX()
+	{
+		if (vertexList == null)
+		{
+			vertexList = new ArrayList<float[]>();
+			try
+			{
+				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(file, new ColladaXMLParser(vertexList));
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		float currentMin = Float.MAX_VALUE;
+		for (float[] xs : vertexList)
+		{
+			if (xs[0] < currentMin)
+			{
+				currentMin = xs[0];
+			}
+		}
+		return currentMin;
+	}
+
+	public float getMaxY()
 	{
 		return 0;
 	}
 
-	public double getMaxY()
-	{
-		return 0;
-	}
-
-	public double getMaxZ()
+	public float getMaxZ()
 	{
 		return 0;
 	}
