@@ -333,7 +333,7 @@ public class StaticObject
 		s += "Group=\"" + group + "\" ";
 		s += "ID=\"" + id + "\" ";
 		s += "Name=\"" + (name != null ? name : "") + "\" ";
-		s += "Rotation=\"" + rotation[0] + " " + rotation[1] + " " + rotation[2] + "\" ";
+		s += "Rotation=\"" + Math.toRadians(rotation[0]) + " " + Math.toRadians(rotation[1]) + " " + Math.toRadians(rotation[2]) + "\" ";
 		s += "Scale=\"" + scale[0] + " " + scale[1] + " " + scale[2] + "\" ";
 		s += "Tag=\"" + (tag != null ? tag : "") + "\" ";
 		s += "WorldPos=\"" + worldPos[0] + " " + worldPos[1] + " " + worldPos[2] + "\" />";
