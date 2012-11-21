@@ -6,8 +6,8 @@ import java.util.List;
 public class ViewportConfig
 {
 	private double[] bgColor = { 0.2, 0.2, 0.2, 1 };
-	private boolean gAmbientLight = false;
-	private boolean gPointLight = false;
+	private boolean gAmbientLight = true;
+	private boolean gPointLight = true;
 	private boolean gridSnap = true;
 	private double gridSnapSeparation = 0.25;
 	private int selectedViewport = 0;

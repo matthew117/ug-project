@@ -7,7 +7,7 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-public class StaticObject
+public class StaticObject extends Primitive
 {
 	private boolean castShadows = true;
 	private boolean collides = true;
@@ -27,7 +27,7 @@ public class StaticObject
 	{
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public StaticObject(StaticObject obj)
 	{
 		this.castShadows = obj.castShadows;
@@ -73,7 +73,7 @@ public class StaticObject
 		}
 		return currentMax;
 	}
-	
+
 	public float getMinX()
 	{
 		if (vertexList == null)
@@ -129,7 +129,7 @@ public class StaticObject
 		}
 		return currentMax;
 	}
-	
+
 	public float getMinY()
 	{
 		if (vertexList == null)
@@ -157,7 +157,7 @@ public class StaticObject
 		}
 		return currentMin;
 	}
-	
+
 	public float getMaxZ()
 	{
 		if (vertexList == null)
@@ -185,7 +185,7 @@ public class StaticObject
 		}
 		return currentMax;
 	}
-	
+
 	public float getMinZ()
 	{
 		if (vertexList == null)
@@ -333,7 +333,8 @@ public class StaticObject
 		s += "Group=\"" + group + "\" ";
 		s += "ID=\"" + id + "\" ";
 		s += "Name=\"" + (name != null ? name : "") + "\" ";
-		s += "Rotation=\"" + Math.toRadians(rotation[0]) + " " + Math.toRadians(rotation[1]) + " " + Math.toRadians(rotation[2]) + "\" ";
+		s += "Rotation=\"" + Math.toRadians(rotation[0]) + " " + Math.toRadians(rotation[1]) + " " + Math
+				.toRadians(rotation[2]) + "\" ";
 		s += "Scale=\"" + scale[0] + " " + scale[1] + " " + scale[2] + "\" ";
 		s += "Tag=\"" + (tag != null ? tag : "") + "\" ";
 		s += "WorldPos=\"" + worldPos[0] + " " + worldPos[1] + " " + worldPos[2] + "\" />";

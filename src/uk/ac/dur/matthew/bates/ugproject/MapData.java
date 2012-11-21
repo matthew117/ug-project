@@ -336,6 +336,10 @@ public class MapData
 		else
 		{
 			s += "\n        <Primitives>";
+			for (Primitive prim : primitives)
+			{
+				s += "\n            " + prim;
+			}
 			s += "\n        </Primitives>";
 		}
 		if (decals.size() == 0)
