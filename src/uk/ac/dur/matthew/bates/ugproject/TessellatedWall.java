@@ -22,7 +22,7 @@ public class TessellatedWall
 		for (int i = 0; i < width; i++)
 		{
 			StaticObject obj = new StaticObject(tileObject);
-			obj.setWorldPos(new float[] { worldPos[0] + i * tileWidth, worldPos[1], worldPos[2] });
+			obj.setWorldPos(new float[] { (worldPos[0] + i * tileWidth)+(tileWidth/2), worldPos[1], worldPos[2] });
 			list.add(obj);
 		}
 		return list;

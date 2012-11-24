@@ -90,7 +90,7 @@ public class HPL2Map
 				"/Applications/Amnesia.app/Contents/Resources/static_objects/mansionbase/floor/mansionbase_floor_boards.mat");
 		plane.setStartCorner(new float[] { 0, 0, 0 });
 		plane.setEndCorner(new float[] { width * objs.size(), 0, width });
-		plane.setWorldPos(new float[]{-(width/2), 0 , 0});
+		plane.setWorldPos(new float[] { 0, 0, 0 });
 		plane.setId(25);
 		map.mapData.getPrimitives().add(plane);
 
