@@ -22,10 +22,17 @@ public class TessellatedWall
 		for (int i = 0; i < width; i++)
 		{
 			StaticObject obj = new StaticObject(tileObject);
-			obj.setWorldPos(new float[] { (worldPos[0] + i * tileWidth)+(tileWidth/2), worldPos[1], worldPos[2] });
+			obj.setWorldPos(calculatedAngularEndPoint(worldPos, tileObject.getRotation()[1],
+					(tileWidth * i) + (tileWidth/2)));
 			list.add(obj);
 		}
 		return list;
+	}
+
+	private float[] calculatedAngularEndPoint(float[] origin, float angle, float distance)
+	{
+		return new float[] { origin[0] + (float) (distance * Math.cos(Math.toRadians(angle))),
+				origin[1], origin[2] + (float) (distance * Math.sin(Math.toRadians(angle))) };
 	}
 
 	public StaticObject getTileObject()
