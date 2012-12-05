@@ -1,8 +1,10 @@
 package uk.ac.dur.matthew.bates.ugproject;
 
-public class Plane extends StaticObject
+public class Plane extends Primitive
 {
 	private boolean active = true;
+	private boolean castShadows = true;
+	private boolean collides = true;
 	private boolean alignToWorldCoords = false;
 	private float[] corner1UV = new float[2];
 	private float[] corner2UV = new float[2];
@@ -23,6 +25,26 @@ public class Plane extends StaticObject
 	public boolean isActive()
 	{
 		return active;
+	}
+
+	public boolean doesCastShadows()
+	{
+		return castShadows;
+	}
+
+	public void setCastShadows(boolean castShadows)
+	{
+		this.castShadows = castShadows;
+	}
+
+	public boolean doesCollides()
+	{
+		return collides;
+	}
+
+	public void setCollides(boolean collides)
+	{
+		this.collides = collides;
 	}
 
 	public void setActive(boolean active)
@@ -161,8 +183,8 @@ public class Plane extends StaticObject
 		String s = "<Plane ";
 		s += "Active=\"" + active + "\" ";
 		s += "AlignToWorldCoords=\"" + alignToWorldCoords + "\" ";
-		s += "CastShadows=\"" + doesCastShadows() + "\" ";
-		s += "Collides=\"" + doesCollides() + "\" ";
+		s += "CastShadows=\"" + castShadows + "\" ";
+		s += "Collides=\"" + collides + "\" ";
 		s += "Corner1UV=\"" + corner1UV[0] + " " + corner1UV[1] + "\" ";
 		s += "Corner2UV=\"" + corner2UV[0] + " " + corner2UV[1] + "\" ";
 		s += "Corner3UV=\"" + corner3UV[0] + " " + corner3UV[1] + "\" ";
@@ -175,7 +197,7 @@ public class Plane extends StaticObject
 		s += "Rotation=\"" + Math.toRadians(getRotation()[0]) + " " + Math
 				.toRadians(getRotation()[1]) + " " + Math.toRadians(getRotation()[2]) + "\" ";
 		s += "Scale=\"" + getScale()[0] + " " + getScale()[1] + " " + getScale()[2] + "\" ";
-		s += "StartCorner=\"" + startCorner[0] + " " + startCorner[1]  + " " + startCorner[2]+ "\" ";
+		s += "StartCorner=\"" + startCorner[0] + " " + startCorner[1] + " " + startCorner[2] + "\" ";
 		s += "Tag=\"" + (getTag() != null ? getTag() : "") + "\" ";
 		s += "TextureAngle=\"" + textureAngle + "\" ";
 		s += "TileAmount=\"" + tileAmount[0] + " " + tileAmount[1] + " " + tileAmount[2] + "\" ";

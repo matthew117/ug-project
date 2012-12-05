@@ -36,7 +36,6 @@ public class MapData
 
 	public MapData()
 	{
-		// TODO Auto-generated constructor stub
 		fileIndexStaticObjects = new ArrayList<String>();
 		fileIndexEntities = new ArrayList<String>();
 		fileIndexDecals = new ArrayList<String>();
@@ -46,7 +45,7 @@ public class MapData
 		decals = new ArrayList<Decal>();
 		entities = new ArrayList<Entity>();
 	}
-
+	
 	public int addStaticObject(StaticObject obj)
 	{
 		String filePath = obj.getFilePath();
@@ -75,6 +74,46 @@ public class MapData
 		obj.setName(fileName);
 
 		staticObjects.add(obj);
+
+		return obj.getId();
+	}
+
+	public int addPrimitive(Primitive obj)
+	{
+		obj.setId(nextID++);
+		obj.setName(obj.getClass().getSimpleName());
+		primitives.add(obj);
+		return obj.getId();
+	}
+	
+	public int addEntity(Entity obj)
+	{
+		String filePath = obj.getFilePath();
+
+		if (fileIndexEntities.contains(obj.getFilePath()))
+		{
+			obj.setFileIndex(fileIndexEntities.indexOf(filePath));
+		}
+		else
+		{
+			obj.setFileIndex(fileIndexEntities.size());
+			fileIndexEntities.add(filePath);
+		}
+		obj.setId(nextID++);
+
+		String[] expPath = filePath.split("" + File.separatorChar);
+		String fileName = expPath[expPath.length - 1].split("\\.")[0];
+
+		int n = 1;
+		for (Entity e : entities)
+		{
+			if (e.getFileIndex() == obj.getFileIndex()) n++;
+		}
+		fileName += "_" + n;
+
+		obj.setName(fileName);
+
+		entities.add(obj);
 
 		return obj.getId();
 	}
@@ -358,6 +397,10 @@ public class MapData
 		else
 		{
 			s += "\n        <Entities>";
+			for (Entity ent : entities)
+			{
+				s += "\n            " + ent;
+			}
 			s += "\n        </Entities>";
 		}
 		s += "\n    </MapContents>";

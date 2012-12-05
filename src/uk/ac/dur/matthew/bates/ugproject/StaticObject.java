@@ -12,32 +12,22 @@ public class StaticObject extends Primitive
 	private boolean castShadows = true;
 	private boolean collides = true;
 	private int fileIndex;
-	private int group = 0;
-	private int id;
-	private String name;
-	private String tag = "";
-	private float[] rotation = { 0, 0, 0 };
-	private float[] scale = { 1, 1, 1 };
-	private float[] worldPos = { 0, 0, 0 };
 	private String filePath;
 
+	// cached vertex list
 	private List<float[]> vertexList;
 
 	public StaticObject()
 	{
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public StaticObject(StaticObject obj)
 	{
+		super((Primitive)obj);
 		this.castShadows = obj.castShadows;
 		this.collides = obj.collides;
 		this.fileIndex = obj.fileIndex;
-		this.group = obj.group;
-		this.tag = obj.tag;
-		this.rotation = obj.rotation.clone();
-		this.scale = obj.scale.clone();
-		this.worldPos = obj.worldPos.clone();
 		this.filePath = obj.filePath;
 	}
 
@@ -244,75 +234,6 @@ public class StaticObject extends Primitive
 		this.fileIndex = fileIndex;
 	}
 
-	public int getGroup()
-	{
-		return group;
-	}
-
-	public void setGroup(int group)
-	{
-		this.group = group;
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public String getTag()
-	{
-		return tag;
-	}
-
-	public void setTag(String tag)
-	{
-		this.tag = tag;
-	}
-
-	public float[] getRotation()
-	{
-		return rotation;
-	}
-
-	public void setRotation(float[] rotation)
-	{
-		this.rotation = rotation;
-	}
-
-	public float[] getScale()
-	{
-		return scale;
-	}
-
-	public void setScale(float[] scale)
-	{
-		this.scale = scale;
-	}
-
-	public float[] getWorldPos()
-	{
-		return worldPos;
-	}
-
-	public void setWorldPos(float[] worldPos)
-	{
-		this.worldPos = worldPos;
-	}
 
 	public String getFilePath()
 	{
@@ -330,14 +251,14 @@ public class StaticObject extends Primitive
 		s += "CastShadows=\"" + castShadows + "\" ";
 		s += "Collides=\"" + collides + "\" ";
 		s += "FileIndex=\"" + fileIndex + "\" ";
-		s += "Group=\"" + group + "\" ";
-		s += "ID=\"" + id + "\" ";
-		s += "Name=\"" + (name != null ? name : "") + "\" ";
-		s += "Rotation=\"" + Math.toRadians(rotation[0]) + " " + Math.toRadians(rotation[1]) + " " + Math
-				.toRadians(rotation[2]) + "\" ";
-		s += "Scale=\"" + scale[0] + " " + scale[1] + " " + scale[2] + "\" ";
-		s += "Tag=\"" + (tag != null ? tag : "") + "\" ";
-		s += "WorldPos=\"" + worldPos[0] + " " + worldPos[1] + " " + worldPos[2] + "\" />";
+		s += "Group=\"" + getGroup() + "\" ";
+		s += "ID=\"" + getId() + "\" ";
+		s += "Name=\"" + (getName() != null ? getName() : "") + "\" ";
+		s += "Rotation=\"" + Math.toRadians(getRotation()[0]) + " " + Math.toRadians(getRotation()[1]) + " " + Math
+				.toRadians(getRotation()[2]) + "\" ";
+		s += "Scale=\"" + getScale()[0] + " " + getScale()[1] + " " + getScale()[2] + "\" ";
+		s += "Tag=\"" + (getTag() != null ? getTag() : "") + "\" ";
+		s += "WorldPos=\"" + getWorldPos()[0] + " " + getWorldPos()[1] + " " + getWorldPos()[2] + "\" />";
 		return s;
 	}
 

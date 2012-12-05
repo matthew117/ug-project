@@ -91,8 +91,11 @@ public class HPL2Map
 		plane.setStartCorner(new float[] { 0, 0, 0 });
 		plane.setEndCorner(new float[] { width * objs.size(), 0, width });
 		plane.setWorldPos(new float[] { 0, 0, 0 });
-		plane.setId(25);
-		map.mapData.getPrimitives().add(plane);
+		map.mapData.addPrimitive(plane);
+		
+		Lamp l = new Lamp();
+		l.setFilePath("entities/lamp/candlestick01/candlestick01.ent");
+		map.mapData.addEntity(l);
 
 		System.out.println(map);
 		map.writeToFile("/Applications/Amnesia.app/Contents/Resources/custom_stories/Luigi_Mansion/file.map");

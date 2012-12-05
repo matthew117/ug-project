@@ -11,11 +11,11 @@ public class Lamp extends Entity
 	protected String userVariablesDelegate()
 	{
 		String s = super.userVariablesDelegate();
-		s += "    <Var Name=\"Lit\" Value=\"" + lit + "\" />\n";
-		s += "    <Var Name=\"ConnectedLight\" Value=\"" + (connectedLight != null ? connectedLight : "") + "\" />\n";
-		s += "    <Var Name=\"ConnectionLightAmount\" Value=\"" + connectionLightAmount + "\" />\n";
-		s += "    <Var Name=\"ConnectionLightUserOnColor\" Value=\"" + connectionLightUseOnColor + "\" />\n";
-		s += "    <Var Name=\"ConnectionLightUseSpac\" Value=\"" + connectionLightUseSpec + "\" />\n";
+		s += "                   <Var Name=\"Lit\" Value=\"" + lit + "\" />\n";
+		s += "                   <Var Name=\"ConnectedLight\" Value=\"" + (connectedLight != null ? connectedLight : "") + "\" />\n";
+		s += "                   <Var Name=\"ConnectionLightAmount\" Value=\"" + connectionLightAmount + "\" />\n";
+		s += "                   <Var Name=\"ConnectionLightUserOnColor\" Value=\"" + connectionLightUseOnColor + "\" />\n";
+		s += "                   <Var Name=\"ConnectionLightUseSpac\" Value=\"" + connectionLightUseSpec + "\" />\n";
 		return s;
 	}
 	
