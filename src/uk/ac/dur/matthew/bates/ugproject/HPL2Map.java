@@ -124,7 +124,19 @@ public class HPL2Map
 		}
 
 		System.out.println(map);
+		
 		map.writeToFile("/Applications/Amnesia.app/Contents/Resources/custom_stories/Luigi_Mansion/file.map");
+		
+//		try
+//		{
+//			SAXParserFactory factory = SAXParserFactory.newInstance();
+//			SAXParser saxParser = factory.newSAXParser();
+//			saxParser.parse(new File("/Applications/Amnesia.app/Contents/Resources/custom_stories/Luigi_Mansion/file.map"), new PrettyPrinter());
+//		}
+//		catch (Exception ex)
+//		{
+//			ex.printStackTrace();
+//		}
 	}
 
 	static List<StaticObject> rooms = new ArrayList<StaticObject>();

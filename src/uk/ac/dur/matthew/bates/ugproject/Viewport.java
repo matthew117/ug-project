@@ -128,7 +128,7 @@ public class Viewport
 		s += "GridPlane=\"" + gridPlane + "\" ";
 		s += "Preset=\"" + preset + "\" ";
 		s += "RenderMode=\"" + renderMode + "\" ";
-		s += "ShowAxes=\"" + showAxes + "\"";
+		s += "ShowAxes=\"" + showAxes + "\" ";
 		s += "ShowGrid=\"" + showGrid + "\" ";
 		s += "UsingLTCam=\"" + usingLTCam + "\" />";
 		return s;
