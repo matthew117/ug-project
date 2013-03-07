@@ -24,18 +24,18 @@ public class Rect
 
 	public int centerX()
 	{
-		return (x + width) >> 1;
+		return x + (width >> 1);
 	}
 
 	public int centerY()
 	{
-		return (y + height) >> 1;
+		return y + (height >> 1);
 	}
 
 	public boolean contains(int x, int y)
 	{
-		// TODO unimplemented method
-		return false;
+		return x >= this.x && x <= this.x + this.width
+				&& y >= this.y && y <= this.y + this.height;
 	}
 	
 	public void inset(int dx, int dy)
