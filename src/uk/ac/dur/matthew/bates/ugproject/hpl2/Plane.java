@@ -1,4 +1,4 @@
-package uk.ac.dur.matthew.bates.ugproject;
+package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 public class Plane extends Primitive
 {

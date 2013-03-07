@@ -1,4 +1,4 @@
-package uk.ac.dur.matthew.bates.ugproject;
+package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import uk.ac.dur.matthew.bates.ugproject.hpl2.util.ColladaXMLParser;
 
 public class StaticObject extends Primitive
 {

@@ -1,4 +1,4 @@
-package uk.ac.dur.matthew.bates.ugproject;
+package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,14 +61,14 @@ public class EditorSession
 	public String toString()
 	{
 		String s = "<EditorSession>";
-		s += "\n    " + performance;
-		s += "\n    " + viewportConfig;
-		s += "\n    <Groups>";
+		s += "\n" + performance;
+		s += "\n" + viewportConfig;
+		s += "\n<Groups>";
 		for (Group g : groups)
 		{
-			s += "\n        " + g;
+			s += "\n" + g;
 		}
-		s += "\n    </Groups>";
+		s += "\n</Groups>";
 		s += "\n</EditorSession>";
 		return s;
 	}

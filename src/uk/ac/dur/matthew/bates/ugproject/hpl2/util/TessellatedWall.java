@@ -1,7 +1,9 @@
-package uk.ac.dur.matthew.bates.ugproject;
+package uk.ac.dur.matthew.bates.ugproject.hpl2.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.ac.dur.matthew.bates.ugproject.hpl2.StaticObject;
 
 public class TessellatedWall
 {

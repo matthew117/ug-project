@@ -1,4 +1,4 @@
-package uk.ac.dur.matthew.bates.ugproject;
+package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,9 +112,9 @@ public class ViewportConfig
 		s += "UsingEnlargedViewport=\"" + usingEnlargedViewport + "\">";
 		for (Viewport vp : viewports)
 		{
-			s += "\n        " + vp;
+			s += "\n" + vp;
 		}
-		s += "\n    </ViewportConfig>";
+		s += "\n</ViewportConfig>";
 		return s;
 	}
 }
