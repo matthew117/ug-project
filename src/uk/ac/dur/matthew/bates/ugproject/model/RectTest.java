@@ -3,8 +3,7 @@
  */
 package uk.ac.dur.matthew.bates.ugproject.model;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
@@ -34,8 +33,8 @@ public class RectTest
 		rect4 = new Rect(10, 10, 20, 20);
 	}
 
-	/**
-	 * 
+	/*
+	 * Runs after the tests to close any lasting connections etc.
 	 */
 	@After
 	public void tearDown()
@@ -49,6 +48,27 @@ public class RectTest
 		assertEquals(50, rect2.centerX());
 		assertEquals(5, rect3.centerX());
 		assertEquals(20, rect4.centerX());
+	}
+
+	@Test
+	public void testCenterY()
+	{
+		assertEquals(25, rect1.centerY());
+		assertEquals(25, rect2.centerY());
+		assertEquals(5, rect3.centerY());
+		assertEquals(20, rect4.centerY());
+	}
+
+	@Test
+	public void testContains()
+	{
+		assertEquals(true, (new Rect(0, 0, 20, 20)).contains(10, 10));
+		assertEquals(true, (new Rect(0, 0, 10, 20)).contains(8, 10));
+		assertEquals(true, (new Rect(0, 0, 10, 10)).contains(10, 10));
+		assertEquals(true, (new Rect(0, 0, 20, 20)).contains(0, 0));
+		assertEquals(false, (new Rect(0, 0, 20, 20)).contains(21, 20));
+		assertEquals(false, (new Rect(0, 0, 20, 20)).contains(-1, -1));
+		assertEquals(false, (new Rect(0, 0, 20, 20)).contains(50, 0));
 	}
 
 }
