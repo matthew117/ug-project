@@ -35,5 +35,11 @@ public class Point
 	{
 		return (41 * (41 + x) + y);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + x + "," + y + ")";
+	}
 
 }

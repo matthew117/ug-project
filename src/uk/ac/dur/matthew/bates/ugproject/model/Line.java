@@ -1,6 +1,7 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 public class Line
 {
@@ -41,7 +42,17 @@ public class Line
 	@Override
 	public int hashCode()
 	{
-		return p.hashCode() * q.hashCode();
+		return p.hashCode() * (41 * q.hashCode());
+	}
+
+	/**
+	 * Flip the direction of the line by switching point p and point q.
+	 * 
+	 * @return a new <code>Line</code> which its direction opposite to this line.
+	 */
+	public Line flip()
+	{
+		return new Line(q.x, q.y, p.x, p.y);
 	}
 
 	/**
@@ -75,5 +86,21 @@ public class Line
 	public boolean isVertical()
 	{
 		return p.x == q.x;
+	}
+	
+	public double length()
+	{
+		return sqrt((q.x - p.x)*(q.x - p.x) + (q.y - p.y)*(q.y - p.y));
+	}
+	
+	public boolean isPositiveDirection()
+	{
+		return sqrt(q.x*q.x + q.y*q.y) >= sqrt(p.x*p.x + p.y*p.y);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return p.toString() + " -> " + q.toString();
 	}
 }

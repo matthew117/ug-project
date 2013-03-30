@@ -40,6 +40,34 @@ public class RectTest
 	public void tearDown()
 	{
 	}
+	
+	@Test
+	public void testLeft()
+	{
+		assertEquals(new Line(0, 0, 0, 50), rect1.left());
+		assertEquals(new Line(10, 10, 10, 30), rect4.left());
+	}
+	
+	@Test
+	public void testRight()
+	{
+		assertEquals(new Line(50, 0, 50, 50), rect1.right());
+		assertEquals(new Line(30, 10, 30, 30), rect4.right());
+	}
+	
+	@Test
+	public void testTop()
+	{
+		assertEquals(new Line(0, 0, 50, 0), rect1.top());
+		assertEquals(new Line(10, 10, 30, 10), rect4.top());
+	}
+	
+	@Test
+	public void testBottom()
+	{
+		assertEquals(new Line(0, 50, 50, 50), rect1.bottom());
+		assertEquals(new Line(10, 30, 30, 30), rect4.bottom());
+	}
 
 	@Test
 	public void testCenterX()
