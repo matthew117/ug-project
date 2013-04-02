@@ -9,5 +9,7 @@ package uk.ac.dur.matthew.bates.ugproject;
  */
 public class CollisionDetection
 {
+	// Prevent people from instantiating this static utility class pointlessly
+	private CollisionDetection(){}
 
 }
