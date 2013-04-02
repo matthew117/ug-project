@@ -81,4 +81,14 @@ public class LineTest
 		assertTrue(line5.toString(), line5.isPositiveDirection());
 	}
 
+	@Test
+	public void testOverlap()
+	{
+		assertEquals(new Line(0, 4, 0, 6),
+				Line.overlap(new Line(0, 0, 0, 6), new Line(0, 4, 0, 10)));
+		assertEquals(new Line(0, 4, 0, 6),
+				Line.overlap(new Line(0, 4, 0, 10), new Line(0, 0, 0, 6)));
+		assertEquals(null, Line.overlap(new Line(0, 0, 0, 6), new Line(1, 4, 1, 10)));
+	}
+
 }

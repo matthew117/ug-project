@@ -103,4 +103,49 @@ public class Line
 	{
 		return p.toString() + " -> " + q.toString();
 	}
+	
+	public Line normalizeDirection()
+	{
+		if (this.isPositiveDirection())
+		{
+			return this;
+		}
+		else
+		{
+			return this.flip();
+		}
+	}
+	
+	public static Line overlap(Line a, Line b)
+	{
+		Line an = a.normalizeDirection();
+		Line bn = b.normalizeDirection();
+		
+		if (a.isHorizontal() && b.isHorizontal() && (a.p.y == b.p.y))
+		{
+			if (a.p.x <= b.p.x)
+			{
+				return new Line(b.p.x, a.p.y, a.q.x, a.p.y);
+			}
+			else
+			{
+				return new Line(a.p.x, a.p.y, b.q.x, a.p.y);
+			}
+		}
+		else if (a.isVertical() && b.isVertical() && (a.p.x == b.p.x))
+		{
+			if (a.p.y <= b.p.y)
+			{
+				return new Line(a.p.x, b.p.y, a.p.x, a.q.y);
+			}
+			else
+			{
+				return new Line(a.p.x, a.p.y, a.p.x, b.q.y);
+			}
+		}
+		else
+		{
+			return null;
+		}
+	}
 }
