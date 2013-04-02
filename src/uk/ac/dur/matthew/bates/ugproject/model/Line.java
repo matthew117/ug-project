@@ -63,7 +63,7 @@ public class Line
 	 */
 	public double gradient()
 	{
-		return abs(q.y - p.y) / abs(q.x - p.x);
+		return abs(q.y - p.y) / (double)abs(q.x - p.x);
 	}
 
 	/**

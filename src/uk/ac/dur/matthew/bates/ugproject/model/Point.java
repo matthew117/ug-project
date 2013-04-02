@@ -41,5 +41,10 @@ public class Point
 	{
 		return "(" + x + "," + y + ")";
 	}
+	
+	private static float cross(Point u, Point v)
+	{
+		return u.y * v.x - u.x * v.y;
+	}
 
 }
