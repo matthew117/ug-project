@@ -10,7 +10,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -21,35 +20,6 @@ import uk.ac.dur.matthew.bates.ugproject.model.Line;
 
 public class ImageTest extends JPanel
 {
-
-	private class Container implements Comparable<Container>
-	{
-		double x;
-		double y;
-		double width;
-		double height;
-
-		public Container(double x, double y, double width, double height)
-		{
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-		}
-
-		@Override
-		public int compareTo(Container o)
-		{
-			return (int) ((this.width * this.height) - (o.width * o.height));
-		}
-
-		@Override
-		public String toString()
-		{
-			return "(" + x + "," + y + ") width: " + width + "  height: " + height;
-		}
-
-	}
 
 	private static final long serialVersionUID = -3436039885124950224L;
 
@@ -109,21 +79,24 @@ public class ImageTest extends JPanel
 	{
 		Graphics2D g = (Graphics2D) gContext;
 
-		// Random r = new Random(System.currentTimeMillis());
-		Random r = new Random(2L);
+		System.out.println(isColliding(new Rectangle(0, 0, 2, 2), new Rectangle(2, 1, 1, 1)));
+
+		Random r = new Random(System.currentTimeMillis());
+		// Random r = new Random(2L);
 		List<Double> roomAreas = Arrays.asList((double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
-//				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
-//				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
+				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
+				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2));
-//		 roomAreas = Arrays.asList(1.0, 1.0, 2.0, 1.0 );
+		roomAreas = Arrays.asList(1.0, 2.0, 3.0, 4.0, 3.0, 2.0, 1.0);
 		List<ArrayList<Double>> xss = squarify(
 				normalizeData(roomAreas, gContext.getClipBounds().getWidth()
 						* gContext.getClipBounds().getHeight()), new ArrayList<Double>(),
 				new Container(0, 0, gContext.getClipBounds().getWidth(), gContext.getClipBounds()
 						.getHeight()), new ArrayList<ArrayList<Double>>());
+		System.out.println(xss);
 		List<Double> xs = flatten(xss);
 
 		List<Line2D.Double> walls = new ArrayList<Line2D.Double>();
@@ -263,334 +236,141 @@ public class ImageTest extends JPanel
 				Line2D.Double lineB;
 				Line2D.Double lineC = walls.get(i);
 				Line2D.Double lineD = walls.get(j);
-				
+
 				Line lnA = new Line((int) lineC.x1, (int) lineC.y1, (int) lineC.x2, (int) lineC.y2);
 				Line lnB = new Line((int) lineD.x1, (int) lineD.y1, (int) lineD.x2, (int) lineD.y2);
 				Line lnO = Line.overlap(lnA, lnB);
-				
-				if (lnO != null && lnO.length() > 50)
+
+				if (Line2D.linesIntersect(lineC.getX1(), lineC.getY1(), lineC.getX2(),
+						lineC.getY2(), lineD.getX1(), lineD.getY1(), lineD.getX2(), lineD.y2))
 				{
-					System.out.println(lnA);
-					System.out.println(lnB);
-					System.out.println(lnO);
-					System.out.println();
-					
-					g.setColor(new Color(0x44FF0000, true));
-					g.setStroke(new BasicStroke(5.0f));
-					double x1 = lnA.p.x;
-					double y1 = lnA.p.y;
-					double x2 = lnA.q.x;
-					double y2 = lnA.q.y;
-					
-					g.drawLine(lnO.p.x, lnO.p.y, lnO.q.x, lnO.q.y);
 
-//					double midpointXA = (x1 + x2) / 2.0;
-//					double midpointYA = (y1 + y2) / 2.0;
-					g.setColor(Color.MAGENTA);
-//					g.setStroke(new BasicStroke());
-//					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//							RenderingHints.VALUE_ANTIALIAS_ON);
-					 g.fillOval(lnO.midpoint().x - 5, lnO.midpoint().y - 5, 10, 10);
+					if (lnO != null && lnO.length() > 50)
+					{
+						System.out.println(lnA);
+						System.out.println(lnB);
+						System.out.println(lnO);
+						System.out.println();
 
-					g.setColor(new Color(0x550000FF, true));
-					g.setStroke(new BasicStroke(5.0f));
-					x1 = lnB.p.x;
-					y1 = lnB.p.y;
-					x2 = lnB.q.x;
-					y2 = lnB.q.y;
-//					g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+						g.setColor(new Color(0x55FF0000, true));
+						g.setStroke(new BasicStroke(5.0f));
+						double x1 = lnA.p.x;
+						double y1 = lnA.p.y;
+						double x2 = lnA.q.x;
+						double y2 = lnA.q.y;
 
-					double midpointXB = (lnO.p.x + lnO.q.x) / 2.0;
-					double midpointYB = (lnO.p.y + lnO.q.y) / 2.0;
-					g.setColor(new Color((i/(float)walls.size()), 0,0));
-					g.setStroke(new BasicStroke());
-					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-							RenderingHints.VALUE_ANTIALIAS_ON);
+						g.drawLine(lnO.p.x, lnO.p.y, lnO.q.x, lnO.q.y);
 
-//					 if (lnO.isHorizontal()) g.fillRect((int) midpointXB - 15, (int) midpointYB - 5,
-//					 30, 10);
-//					 else g.fillRect((int) midpointXB - 5, (int) midpointYB - 15, 10, 30);
+						// double midpointXA = (x1 + x2) / 2.0;
+						// double midpointYA = (y1 + y2) / 2.0;
+						// g.setColor(Color.MAGENTA);
+						// g.setStroke(new BasicStroke());
+						// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						// RenderingHints.VALUE_ANTIALIAS_ON);
+						// g.fillOval(lnO.midpoint().x - 5, lnO.midpoint().y - 5, 10, 10);
 
-//					 g.drawLine((int) midpointXA, (int) midpointYA, (int) midpointXB, (int)
-//					 midpointYB);
+						g.setColor(new Color(0x550000FF, true));
+						g.setStroke(new BasicStroke(5.0f));
+						g.drawLine(lnO.p.x, lnO.p.y, lnO.q.x, lnO.q.y);
+						x1 = lnB.p.x;
+						y1 = lnB.p.y;
+						x2 = lnB.q.x;
+						y2 = lnB.q.y;
+						// g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
 
+						double midpointXB = (lnO.p.x + lnO.q.x) / 2.0;
+						double midpointYB = (lnO.p.y + lnO.q.y) / 2.0;
+						g.setColor(Color.GRAY);
+						g.setStroke(new BasicStroke());
+						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+								RenderingHints.VALUE_ANTIALIAS_ON);
+
+						if (lnO.isHorizontal()) g.fillRect((int) midpointXB - 15,
+								(int) midpointYB - 5, 30, 10);
+						else g.fillRect((int) midpointXB - 5, (int) midpointYB - 15, 10, 30);
+
+						// g.drawLine((int) midpointXA, (int) midpointYA, (int) midpointXB, (int)
+						// midpointYB);
+
+					}
+
+					double dx = (lineC.x2 - lineC.x1);
+					double dy = (lineC.y2 - lineC.y1);
+
+					double lengthOfLineC = Math.sqrt(dx * dx + dy * dy);
+
+					dx = (lineD.x2 - lineD.x1);
+					dy = (lineD.y2 - lineD.y1);
+					double lengthOfLineD = Math.sqrt(dx * dx + dy * dy);
+
+					if (lengthOfLineC >= lengthOfLineD)
+					{
+						lineA = walls.get(i);
+						lineB = walls.get(j);
+					}
+					else
+					{
+						lineA = walls.get(j);
+						lineB = walls.get(i);
+					}
+
+					double gradientA = Math.abs(lineA.getY2() - lineA.getY1())
+							/ Math.abs(lineA.getX2() - lineA.getX1());
+					double gradientB = Math.abs(lineB.getY2() - lineB.getY1())
+							/ Math.abs(lineB.getX2() - lineB.getX1());
+
+					// check that gradients are the same vertical case horizontal case
+					// if (gradientA == gradientB
+					// && ((Double.isInfinite(gradientA) && lineA.x1 == lineB.x1
+					// && lineB.getY1() >= lineA.getY1() && lineB.getY2() <= lineA.getY2()) ||
+					// (gradientA == 0)
+					// && lineA.y1 == lineB.y1
+					// && lineB.getX1() >= lineA.getX1()
+					// && lineB.getX2() <= lineA.getX2()))
+					// if (Line.overlap(lnA, lnA) != null)
+					// {
+					// g.setColor(new Color(0x55FF0000, true));
+					// g.setStroke(new BasicStroke(5.0f));
+					// double x1 = lineA.getX1();
+					// double y1 = lineA.getY1();
+					// double x2 = lineA.getX2();
+					// double y2 = lineA.getY2();
+					// g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+					//
+					// double midpointXA = (x1 + x2) / 2.0;
+					// double midpointYA = (y1 + y2) / 2.0;
+					// g.setColor(Color.GREEN);
+					// g.setStroke(new BasicStroke());
+					// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					// RenderingHints.VALUE_ANTIALIAS_ON);
+					// // g2d.fillOval((int) midpointXA - 5, (int) midpointYA - 5, 10, 10);
+					//
+					// g.setColor(new Color(0x550000FF, true));
+					// g.setStroke(new BasicStroke(5.0f));
+					// x1 = lineB.getX1();
+					// y1 = lineB.getY1();
+					// x2 = lineB.getX2();
+					// y2 = lineB.getY2();
+					// g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+					//
+					// double midpointXB = (x1 + x2) / 2.0;
+					// double midpointYB = (y1 + y2) / 2.0;
+					// g.setColor(Color.GRAY);
+					// g.setStroke(new BasicStroke());
+					// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					// RenderingHints.VALUE_ANTIALIAS_ON);
+					//
+					// // if (gradientA == 0) g.fillRect((int) midpointXB - 15, (int) midpointYB -
+					// 5,
+					// // 30, 10);
+					// // else g.fillRect((int) midpointXB - 5, (int) midpointYB - 15, 10, 30);
+					//
+					// // g2d.drawLine((int) midpointXA, (int) midpointYA, (int) midpointXB, (int)
+					// // midpointYB);
+					//
+					// }
 				}
-
-				double dx = (lineC.x2 - lineC.x1);
-				double dy = (lineC.y2 - lineC.y1);
-
-				double lengthOfLineC = Math.sqrt(dx * dx + dy * dy);
-
-				dx = (lineD.x2 - lineD.x1);
-				dy = (lineD.y2 - lineD.y1);
-				double lengthOfLineD = Math.sqrt(dx * dx + dy * dy);
-
-				if (lengthOfLineC >= lengthOfLineD)
-				{
-					lineA = walls.get(i);
-					lineB = walls.get(j);
-				}
-				else
-				{
-					lineA = walls.get(j);
-					lineB = walls.get(i);
-				}
-
-				double gradientA = Math.abs(lineA.getY2() - lineA.getY1())
-						/ Math.abs(lineA.getX2() - lineA.getX1());
-				double gradientB = Math.abs(lineB.getY2() - lineB.getY1())
-						/ Math.abs(lineB.getX2() - lineB.getX1());
-
-				// check that gradients are the same vertical case horizontal case
-//				if (gradientA == gradientB
-//						&& ((Double.isInfinite(gradientA) && lineA.x1 == lineB.x1
-//								&& lineB.getY1() >= lineA.getY1() && lineB.getY2() <= lineA.getY2()) || (gradientA == 0)
-//								&& lineA.y1 == lineB.y1
-//								&& lineB.getX1() >= lineA.getX1()
-//								&& lineB.getX2() <= lineA.getX2()))
-//				if (Line.overlap(lnA, lnA) != null)
-//				{
-//					g.setColor(new Color(0x55FF0000, true));
-//					g.setStroke(new BasicStroke(5.0f));
-//					double x1 = lineA.getX1();
-//					double y1 = lineA.getY1();
-//					double x2 = lineA.getX2();
-//					double y2 = lineA.getY2();
-//					g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
-//
-//					double midpointXA = (x1 + x2) / 2.0;
-//					double midpointYA = (y1 + y2) / 2.0;
-//					g.setColor(Color.GREEN);
-//					g.setStroke(new BasicStroke());
-//					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//							RenderingHints.VALUE_ANTIALIAS_ON);
-//					// g2d.fillOval((int) midpointXA - 5, (int) midpointYA - 5, 10, 10);
-//
-//					g.setColor(new Color(0x550000FF, true));
-//					g.setStroke(new BasicStroke(5.0f));
-//					x1 = lineB.getX1();
-//					y1 = lineB.getY1();
-//					x2 = lineB.getX2();
-//					y2 = lineB.getY2();
-//					g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
-//
-//					double midpointXB = (x1 + x2) / 2.0;
-//					double midpointYB = (y1 + y2) / 2.0;
-//					g.setColor(Color.GRAY);
-//					g.setStroke(new BasicStroke());
-//					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//							RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//					// if (gradientA == 0) g.fillRect((int) midpointXB - 15, (int) midpointYB - 5,
-//					// 30, 10);
-//					// else g.fillRect((int) midpointXB - 5, (int) midpointYB - 15, 10, 30);
-//
-//					// g2d.drawLine((int) midpointXA, (int) midpointYA, (int) midpointXB, (int)
-//					// midpointYB);
-//
-//				}
 			}
-		}
-	}
-
-	public double shortestEdge(Container r)
-	{
-		return Math.min(r.height, r.width);
-	}
-
-	public List<Double> flatten(List<ArrayList<Double>> xs2)
-	{
-		List<Double> xs = new ArrayList<Double>();
-		for (List<Double> ys : xs2)
-		{
-			for (Double d : ys)
-				xs.add(d);
-		}
-		return xs;
-	}
-
-	public List<Double> normalizeData(List<Double> data, Double area)
-	{
-		List<Double> normalizedData = new ArrayList<Double>();
-		double sum = sumArray(data);
-		double multiplier = area / sum;
-
-		for (Double d : data)
-		{
-			normalizedData.add(d * multiplier);
-		}
-
-		return normalizedData;
-	}
-
-	public ArrayList<Double> getCoordinates(Container r, List<Double> row)
-	{
-		ArrayList<Double> coordinates = new ArrayList<Double>();
-		double subxoffset = r.x;
-		double subyoffset = r.y;
-		double areaWidth = sumArray(row) / r.height;
-		double areaHeight = sumArray(row) / r.width;
-
-		if (r.width >= r.height)
-		{
-			for (int i = 0; i < row.size(); i++)
-			{
-				coordinates.add(subxoffset);
-				coordinates.add(subyoffset);
-				coordinates.add(subxoffset + areaWidth);
-				coordinates.add(subyoffset + row.get(i) / areaWidth);
-				subyoffset = subyoffset + row.get(i) / areaWidth;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < row.size(); i++)
-			{
-				coordinates.add(subxoffset);
-				coordinates.add(subyoffset);
-				coordinates.add(subxoffset + row.get(i) / areaHeight);
-				coordinates.add(subyoffset + areaHeight);
-				subxoffset = subxoffset + row.get(i) / areaHeight;
-			}
-		}
-		return coordinates;
-	}
-
-	public Container cutArea(Container r, double area)
-	{
-		Container newContainer;
-
-		if (r.width >= r.height)
-		{
-			double areaWidth = area / r.height;
-			double newWidth = r.width - areaWidth;
-			newContainer = new Container(r.x + areaWidth, r.y, newWidth, r.height);
-		}
-		else
-		{
-			double areaHeight = area / r.width;
-			double newHeight = r.height - areaHeight;
-			newContainer = new Container(r.x, r.y + areaHeight, r.width, newHeight);
-		}
-
-		return newContainer;
-	}
-
-	public ArrayList<ArrayList<Double>> squarify(List<Double> data, List<Double> currentRow,
-			Container container, ArrayList<ArrayList<Double>> stack)
-	{
-		double length;
-		double nextDataPoint;
-		Container newContainer;
-
-		if (data.size() == 0)
-		{
-			stack.add(getCoordinates(container, currentRow));
-			return null;
-		}
-
-		length = shortestEdge(container);
-		nextDataPoint = data.get(0);
-
-		if (improvesRatio(currentRow, nextDataPoint, length))
-		{
-			currentRow.add(nextDataPoint);
-			squarify(tail(data), currentRow, container, stack);
-		}
-		else
-		{
-			newContainer = cutArea(container, sumArray(currentRow));
-			stack.add(getCoordinates(container, currentRow));
-			squarify(data, new ArrayList<Double>(), newContainer, stack);
-		}
-		return stack;
-	}
-
-	public double calculateRatio(List<Double> R, double w)
-	{
-		double s = sumArray(R);
-		double max = Collections.max(R);
-		double min = Collections.min(R);
-
-		return Math.max((w * w * max) / (s * s), (s * s) / (w * w * min));
-	}
-
-	public double sumArray(List<Double> xs)
-	{
-		double s = 0;
-		for (Double d : xs)
-			s += d;
-		return s;
-	}
-
-	public boolean improvesRatio(List<Double> currentRow, double nextNode, double length)
-	{
-		if (currentRow.size() == 0) return true;
-
-		List<Double> newRow = new ArrayList<Double>(currentRow);
-		newRow.add(nextNode);
-
-		double currentRatio = calculateRatio(currentRow, length);
-		double newRatio = calculateRatio(newRow, length);
-
-		return currentRatio >= newRatio;
-	}
-
-	public List<Double> append(List<Double> xs, List<Double> ys)
-	{
-		List<Double> zs = new ArrayList<Double>();
-		for (Double d : xs)
-			zs.add(d);
-		for (Double d : ys)
-			zs.add(d);
-		return zs;
-	}
-
-	public List<Double> append(List<Double> xs, Double y)
-	{
-		List<Double> zs = new ArrayList<Double>();
-		for (Double d : xs)
-			zs.add(d);
-		zs.add(y);
-		return zs;
-	}
-
-	public List<Double> tail(List<Double> xs)
-	{
-		if (xs.size() == 0) return new ArrayList<Double>();
-		List<Double> x = new ArrayList<Double>(xs.subList(1, xs.size()));
-		return x;
-	}
-
-	public Double head(List<Double> xs)
-	{
-		return xs.get(0);
-	}
-
-	public void split(Graphics2D g, int x, int y, int width, int height)
-	{
-		if (width <= 40) return;
-		if (height <= 40) return;
-		g.drawRect(x, y, width, height);
-		// split horizontally left
-		if ((new Random()).nextBoolean())
-		{
-			split(g, x, y, width / 2, height);
-		}
-		// split horizontally right
-		if ((new Random()).nextBoolean())
-		{
-			split(g, x + (width / 2), y, width / 2, height);
-		}
-		// split vertically down
-		if ((new Random()).nextBoolean())
-		{
-			split(g, x, y + (height / 2), width, height / 2);
-		}
-		// split vertically up
-		if ((new Random()).nextBoolean())
-		{
-			split(g, x, y - (height / 2), width, height / 2);
 		}
 	}
 
