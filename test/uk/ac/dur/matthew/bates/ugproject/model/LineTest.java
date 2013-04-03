@@ -1,6 +1,7 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -98,6 +99,10 @@ public class LineTest
 		assertEquals(new Line(0, 0, 0, 2), Line.overlap(new Line(0, 0, 0, 4), new Line(0, 0, 0, 2)));
 		assertEquals(new Line(0, 1, 0, 3), Line.overlap(new Line(0, 0, 0, 4), new Line(0, 1, 0, 3)));
 		assertEquals(new Line(0, 1, 0, 3), Line.overlap(new Line(0, 1, 0, 3), new Line(0, 0, 0, 4)));
+
+		assertThat(new Line(225, 398, 225, 239),
+				not(equalTo(Line.overlap(new Line(225, 398, 225, 598), new Line(225, 0, 225, 239)))));
+		assertEquals(null, Line.overlap(new Line(225, 398, 225, 598), new Line(225, 0, 225, 239)));
 	}
 
 }

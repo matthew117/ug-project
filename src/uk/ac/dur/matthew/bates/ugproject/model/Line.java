@@ -168,7 +168,7 @@ public class Line
 			}
 			else
 			{
-				if (b.q.x < a.p.x) return null;
+				if (b.q.y < a.p.y) return null;
 				return new Line(a.p.x, a.p.y, a.p.x, b.q.y);
 			}
 		}
