@@ -63,7 +63,7 @@ public class Line
 	 */
 	public double gradient()
 	{
-		return abs(q.y - p.y) / (double)abs(q.x - p.x);
+		return abs(q.y - p.y) / (double) abs(q.x - p.x);
 	}
 
 	/**
@@ -87,23 +87,23 @@ public class Line
 	{
 		return p.x == q.x;
 	}
-	
+
 	public double length()
 	{
-		return sqrt((q.x - p.x)*(q.x - p.x) + (q.y - p.y)*(q.y - p.y));
+		return sqrt((q.x - p.x) * (q.x - p.x) + (q.y - p.y) * (q.y - p.y));
 	}
-	
+
 	public boolean isPositiveDirection()
 	{
-		return sqrt(q.x*q.x + q.y*q.y) >= sqrt(p.x*p.x + p.y*p.y);
+		return sqrt(q.x * q.x + q.y * q.y) >= sqrt(p.x * p.x + p.y * p.y);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return p.toString() + " -> " + q.toString();
 	}
-	
+
 	public Line normalizeDirection()
 	{
 		if (this.isPositiveDirection())
@@ -115,31 +115,60 @@ public class Line
 			return this.flip();
 		}
 	}
-	
+
+	public Point midpoint()
+	{
+		return new Point((p.x + q.x) / 2, (p.y + q.y) / 2);
+	}
+
 	public static Line overlap(Line a, Line b)
 	{
 		Line an = a.normalizeDirection();
 		Line bn = b.normalizeDirection();
-		
+
 		if (a.isHorizontal() && b.isHorizontal() && (a.p.y == b.p.y))
-		{
+		{					
+			if (a.p.x <= b.p.x && b.q.x <= a.q.x)
+			{
+				return b;
+			}
+			
+			if (b.p.x <= a.p.x && a.q.x <= b.q.x)
+			{
+				return a;
+			}
+			
 			if (a.p.x <= b.p.x)
 			{
+				if (a.q.x < b.p.x) return null;
 				return new Line(b.p.x, a.p.y, a.q.x, a.p.y);
 			}
 			else
 			{
+				if (b.q.x < a.p.x) return null;
 				return new Line(a.p.x, a.p.y, b.q.x, a.p.y);
 			}
 		}
 		else if (a.isVertical() && b.isVertical() && (a.p.x == b.p.x))
 		{
+			if (a.p.y <= b.p.y && b.q.y <= a.q.y)
+			{
+				return b;
+			}
+			
+			if (b.p.y <= a.p.y && a.q.y <= b.q.y)
+			{
+				return a;
+			}
+			
 			if (a.p.y <= b.p.y)
 			{
+				if (a.q.y < b.p.y) return null;
 				return new Line(a.p.x, b.p.y, a.p.x, a.q.y);
 			}
 			else
 			{
+				if (b.q.x < a.p.x) return null;
 				return new Line(a.p.x, a.p.y, a.p.x, b.q.y);
 			}
 		}

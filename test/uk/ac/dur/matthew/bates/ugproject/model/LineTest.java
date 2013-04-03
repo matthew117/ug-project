@@ -89,6 +89,15 @@ public class LineTest
 		assertEquals(new Line(0, 4, 0, 6),
 				Line.overlap(new Line(0, 4, 0, 10), new Line(0, 0, 0, 6)));
 		assertEquals(null, Line.overlap(new Line(0, 0, 0, 6), new Line(1, 4, 1, 10)));
+		assertEquals(new Line(1, 2, 1, 3), Line.overlap(new Line(1, 1, 1, 3), new Line(1, 2, 1, 4)));
+		assertEquals(new Line(0, 3, 0, 3), Line.overlap(new Line(0, 0, 0, 3), new Line(0, 3, 0, 6)));
+		assertEquals(null, Line.overlap(new Line(0, 0, 0, 2), new Line(0, 4, 0, 6)));
+		assertEquals(null, Line.overlap(new Line(0, 0, 2, 0), new Line(4, 0, 6, 0)));
+
+		assertEquals(new Line(0, 0, 0, 3), Line.overlap(new Line(0, 0, 0, 3), new Line(0, 0, 0, 5)));
+		assertEquals(new Line(0, 0, 0, 2), Line.overlap(new Line(0, 0, 0, 4), new Line(0, 0, 0, 2)));
+		assertEquals(new Line(0, 1, 0, 3), Line.overlap(new Line(0, 0, 0, 4), new Line(0, 1, 0, 3)));
+		assertEquals(new Line(0, 1, 0, 3), Line.overlap(new Line(0, 1, 0, 3), new Line(0, 0, 0, 4)));
 	}
 
 }
