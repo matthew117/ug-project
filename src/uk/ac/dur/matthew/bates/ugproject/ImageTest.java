@@ -1,14 +1,10 @@
 package uk.ac.dur.matthew.bates.ugproject;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -17,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import uk.ac.dur.matthew.bates.ugproject.generators.Squarify;
-import uk.ac.dur.matthew.bates.ugproject.model.Line;
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
 import uk.ac.dur.matthew.bates.ugproject.model.RectF;
 

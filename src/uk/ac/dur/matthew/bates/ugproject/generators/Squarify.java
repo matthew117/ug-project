@@ -1,6 +1,5 @@
 package uk.ac.dur.matthew.bates.ugproject.generators;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
