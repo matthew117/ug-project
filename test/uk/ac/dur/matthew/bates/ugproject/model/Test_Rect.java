@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author Matthew Bates
  *
  */
-public class RectTest
+public class Test_Rect
 {
 	private Rect rect1;
 	private Rect rect2;

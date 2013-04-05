@@ -6,7 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LineTest
+public class Test_Line
 {
 	private static final double DELTA = 1E-12;
 

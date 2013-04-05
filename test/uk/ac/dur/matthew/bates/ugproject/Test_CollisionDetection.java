@@ -1,6 +1,6 @@
 package uk.ac.dur.matthew.bates.ugproject;
 
-public class TestCollisionDetection
+public class Test_CollisionDetection
 {
 
 }
