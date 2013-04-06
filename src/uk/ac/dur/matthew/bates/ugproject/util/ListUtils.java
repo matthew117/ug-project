@@ -1,7 +1,9 @@
 package uk.ac.dur.matthew.bates.ugproject.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class ListUtils
 {
@@ -10,54 +12,80 @@ public class ListUtils
 	{
 	}
 
-	public static List<Double> flatten(List<ArrayList<Double>> xs2)
+	public static <T> List<T> flatten(List<ArrayList<T>> xss)
 	{
-		List<Double> xs = new ArrayList<Double>();
-		for (List<Double> ys : xs2)
+		if (xss == null) throw new NullPointerException();
+		List<T> ys = new ArrayList<T>();
+		for (List<T> xs : xss)
 		{
-			for (Double d : ys)
-				xs.add(d);
+			for (T e : xs)
+				ys.add(e);
 		}
-		return xs;
+		return ys;
 	}
 
-	public static double sum(List<Double> xs)
+	public static double sumDouble(List<Double> xs)
+	{	
+		if (xs == null || xs.isEmpty()) return 0.0;
+		double sum = 0;
+		for (Double n : xs)
+			sum += n;
+		return sum;
+	}
+	
+	public static int sumInt(List<Integer> xs)
 	{
-		double s = 0;
-		for (Double d : xs)
-			s += d;
-		return s;
+		if (xs == null || xs.isEmpty()) return 0;
+		int sum = 0;
+		for (Integer n : xs)
+			sum += n;
+		return sum;
 	}
 
-	public static List<Double> append(List<Double> xs, List<Double> ys)
+	public static <T> List<T> append(List<T> xs, List<T> ys)
 	{
-		List<Double> zs = new ArrayList<Double>();
-		for (Double d : xs)
-			zs.add(d);
-		for (Double d : ys)
-			zs.add(d);
+		if (xs == null && ys == null) throw new NullPointerException();
+		if (xs == null || xs.isEmpty()) return new ArrayList<T>(ys);
+		if (ys == null || ys.isEmpty()) return new ArrayList<T>(xs);
+		List<T> zs = new ArrayList<T>();
+		for (T e : xs)
+			zs.add(e);
+		for (T e : ys)
+			zs.add(e);
 		return zs;
 	}
 
-	public static List<Double> append(List<Double> xs, Double y)
+	public static <T> List<T> append(List<T> xs, T x)
 	{
-		List<Double> zs = new ArrayList<Double>();
-		for (Double d : xs)
-			zs.add(d);
-		zs.add(y);
-		return zs;
+		List<T> ys = new ArrayList<T>();
+		for (T e : xs)
+			ys.add(e);
+		ys.add(x);
+		return ys;
 	}
 
-	public static List<Double> tail(List<Double> xs)
+	public static <T> List<T> tail(List<T> xs)
 	{
-		if (xs.size() == 0) return new ArrayList<Double>();
-		List<Double> x = new ArrayList<Double>(xs.subList(1, xs.size()));
+		if (xs == null) throw new NullPointerException();
+		if (xs.isEmpty()) return new ArrayList<T>();
+		List<T> x = new ArrayList<T>(xs.subList(1, xs.size()));
 		return x;
 	}
 
-	public static Double head(List<Double> xs)
+	public static <T> T head(List<T> xs)
 	{
+		if (xs == null) throw new NullPointerException();
+		if (xs.isEmpty()) throw new IllegalArgumentException("The empty list has no 'head'.");
 		return xs.get(0);
+	}
+	
+	public static <T> T random(List<T> xs)
+	{
+		if (xs == null) throw new NullPointerException();
+		if (xs.isEmpty()) return null;
+		Random r = new Random();
+		int i = r.nextInt(xs.size());
+		return xs.get(i);
 	}
 
 }
