@@ -86,7 +86,7 @@ public class ImageTest extends JPanel
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2),
 				(double) (r.nextInt(6) + 2), (double) (r.nextInt(6) + 2));
-		roomAreas = Arrays.asList(1.0, 2.0, 3.0, 4.0, 3.0, 2.0, 1.0);
+		roomAreas = Arrays.asList(21.0, 10.0, 9.0, 8.0, 3.0, 2.3, 14.0, 7.0, 10.0);
 		
 		List<Rect> rooms = Squarify.squarify(roomAreas, new RectF(0, 0, getWidth(), getHeight()));
 
