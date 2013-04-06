@@ -1,4 +1,4 @@
-	Outside	Kitchen	Pantry	Laundry	Living	Dining	Toilet	Bedroom	Master	Bath	Secondary
+	Outside	Kitchen	Pantry	Laundry	Living	Dining	Toilet	Bedroom	Master	Bathroom	Secondary
 Outside		x			x						
 Kitchen	x		x	x	x	x					
 Pantry		x		x							
