@@ -6,7 +6,8 @@ import java.util.List;
 
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
 import uk.ac.dur.matthew.bates.ugproject.model.RectF;
-import uk.ac.dur.matthew.bates.ugproject.util.ListUtils;
+
+import static uk.ac.dur.matthew.bates.ugproject.util.ListUtils.*;
 
 /**
  * Squarified Treemap algorithm based on the implementation of Treemap Squared:
@@ -17,7 +18,7 @@ public class Squarify
 	public static List<Rect> squarify(List<Double> data, RectF container)
 	{
 		List<Double> normalizedData = normalizeData(data, container.height * container.width);
-		List<Double> coordinateList = ListUtils.flatten(squarify(normalizedData,
+		List<Double> coordinateList = flatten(squarify(normalizedData,
 				new ArrayList<Double>(), container, new ArrayList<ArrayList<Double>>()));
 
 		List<Rect> returnList = new ArrayList<Rect>();
@@ -55,11 +56,11 @@ public class Squarify
 		if (improvesRatio(currentRow, nextDataPoint, length))
 		{
 			currentRow.add(nextDataPoint);
-			squarify(ListUtils.tail(data), currentRow, container, stack);
+			squarify(tail(data), currentRow, container, stack);
 		}
 		else
 		{
-			newContainer = cutArea(container, ListUtils.sum(currentRow));
+			newContainer = cutArea(container, sumDouble(currentRow));
 			stack.add(getCoordinates(container, currentRow));
 			squarify(data, new ArrayList<Double>(), newContainer, stack);
 		}
@@ -74,7 +75,7 @@ public class Squarify
 	private static List<Double> normalizeData(List<Double> data, Double area)
 	{
 		List<Double> normalizedData = new ArrayList<Double>();
-		double sum = ListUtils.sum(data);
+		double sum = sumDouble(data);
 		double multiplier = area / sum;
 
 		for (Double d : data)
@@ -90,8 +91,8 @@ public class Squarify
 		ArrayList<Double> coordinates = new ArrayList<Double>();
 		double subxoffset = r.x;
 		double subyoffset = r.y;
-		double areaWidth = ListUtils.sum(row) / r.height;
-		double areaHeight = ListUtils.sum(row) / r.width;
+		double areaWidth = sumDouble(row) / r.height;
+		double areaHeight = sumDouble(row) / r.width;
 
 		if (r.width >= r.height)
 		{
@@ -140,7 +141,7 @@ public class Squarify
 
 	private static double calculateRatio(List<Double> R, double w)
 	{
-		double s = ListUtils.sum(R);
+		double s = sumDouble(R);
 		double max = Collections.max(R);
 		double min = Collections.min(R);
 
