@@ -1,5 +1,8 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
+import static uk.ac.dur.matthew.bates.ugproject.model.Line.overlap;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class FeatureDetection
@@ -9,7 +12,9 @@ public class FeatureDetection
 	 */
 	public static boolean isDirectlyAbove(Rect a, Rect b)
 	{
-		return false;
+		if (isOnTopLeftCorner(a, b)) return false;
+		if (isOnTopRightCorner(a, b)) return false;
+		return overlap(a.bottom(), b.top()) != null;
 	}
 	
 	/**
@@ -17,7 +22,9 @@ public class FeatureDetection
 	 */
 	public static boolean isDirectlyBelow(Rect a, Rect b)
 	{
-		return false;
+		if (isOnBottomLeftCorner(a, b)) return false;
+		if (isOnBottomRightCorner(a, b)) return false;
+		return overlap(a.top(), b.bottom()) != null;
 	}
 	
 	/**
@@ -25,7 +32,9 @@ public class FeatureDetection
 	 */
 	public static boolean isDirectlyLeftOf(Rect a, Rect b)
 	{
-		return false;
+		if (isOnTopLeftCorner(a, b)) return false;
+		if (isOnBottomLeftCorner(a, b)) return false;
+		return overlap(a.right(), b.left()) != null;
 	}
 	
 	/**
@@ -33,7 +42,9 @@ public class FeatureDetection
 	 */
 	public static boolean isDirectlyRightOf(Rect a, Rect b)
 	{
-		return false;
+		if (isOnTopRightCorner(a, b)) return false;
+		if (isOnBottomRightCorner(a, b)) return false;
+		return overlap(a.left(), b.right()) != null;
 	}
 	
 	/**
@@ -41,7 +52,9 @@ public class FeatureDetection
 	 */
 	public static boolean isOnTopLeftCorner(Rect a, Rect b)
 	{
-		return false;
+		Point ap = new Point(a.x + a.width, a.y + a.height);
+		Point bp = new Point(b.x, b.y);
+		return ap.equals(bp);
 	}
 	
 	/**
@@ -49,7 +62,9 @@ public class FeatureDetection
 	 */
 	public static boolean isOnTopRightCorner(Rect a, Rect b)
 	{
-		return false;
+		Point ap = new Point(a.x, a.y + a.height);
+		Point bp = new Point(b.x + b.width, b.y);
+		return ap.equals(bp);
 	}
 	
 	/**
@@ -57,7 +72,9 @@ public class FeatureDetection
 	 */
 	public static boolean isOnBottomLeftCorner(Rect a, Rect b)
 	{
-		return false;
+		Point ap = new Point(a.x + a.width, a.y);
+		Point bp = new Point(b.x, b.y + b.height);
+		return ap.equals(bp);
 	}
 	
 	/**
@@ -65,7 +82,9 @@ public class FeatureDetection
 	 */
 	public static boolean isOnBottomRightCorner(Rect a, Rect b)
 	{
-		return false;
+		Point ap = new Point(a.x, a.y);
+		Point bp = new Point(b.x + b.width, b.y + b.height);
+		return ap.equals(bp);
 	}
 	
 	/**
@@ -73,7 +92,19 @@ public class FeatureDetection
 	 */
 	public static List<Rect> listBottomMostRectangles(List<Rect> rects)
 	{
-		return null;
+		int lowestPoint = 0;
+		for (Rect r : rects)
+		{
+			int baseline = r.y + r.height;
+			if (baseline > lowestPoint) lowestPoint = baseline;
+		}
+		List<Rect> returnList = new ArrayList<Rect>();
+		for (Rect r : rects)
+		{
+			int baseline = r.y + r.height;
+			if (baseline == lowestPoint) returnList.add(r);
+		}
+		return returnList;
 	}
 	
 }
