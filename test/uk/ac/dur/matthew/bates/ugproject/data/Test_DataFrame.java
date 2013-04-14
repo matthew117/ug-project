@@ -16,7 +16,7 @@ public class Test_DataFrame
 	@Before
 	public void setUp()
 	{
-		tf = DataFrame.loadFromFile(new File("room_connections.txt"), true, true);
+		tf = DataFrame.loadFromFile(new File("room_connections.tsv"), true, true);
 	}
 
 	@Test

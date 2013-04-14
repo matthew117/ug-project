@@ -76,8 +76,20 @@ public class DataFrame
 		List<String> rowLabels = rowLabels();
 		List<String> columnLabels = columnLabels();
 
+		
+		
+		
+		
 		int row = rowLabels.indexOf(rowLabel);
-		int column = columnLabel.indexOf(columnLabel);
+		System.out.println(rowLabel);
+		System.out.println(rowLabels);
+		System.out.println("Row Label Index : " + row);
+		
+		
+		int column = columnLabels.indexOf(columnLabel);
+		System.out.println(columnLabel);
+		System.out.println(columnLabels);
+		System.out.println("Column Label Index : " + column);
 
 		return get(row, column);
 	}
@@ -85,7 +97,7 @@ public class DataFrame
 	public List<String> columnLabels()
 	{
 		if (!includeColumnLabels) return null;
-		return data.get(0).subList(1, data.size());
+		return data.get(0).subList(1, data.get(0).size());
 	}
 
 	public List<String> rowLabels()
