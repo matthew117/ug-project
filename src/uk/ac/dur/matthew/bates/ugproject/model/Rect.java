@@ -71,6 +71,11 @@ public class Rect
 		// TODO unimplemented method
 	}
 
+	public Point midpoint()
+	{
+		return new Point(x + (width >> 1), y + (height >> 1));
+	}
+
 	public String toString()
 	{
 		return String.format("[x:%d, y:%d, w:%d, h:%d]", x, y, width, height);
