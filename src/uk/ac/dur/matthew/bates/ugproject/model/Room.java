@@ -18,7 +18,28 @@ public class Room extends Rect
 		BATHROOM,
 		GUEST_ROOM,
 		STUDY,
-		STORAGE
+		STORAGE;
+		
+		public String toString()
+		{
+			switch (this)
+			{
+			case KITCHEN: return "Kitchen";
+			case PANTRY: return "Pantry";
+			case LAUNDRY: return "Laundry";
+			case LIVING_ROOM: return "Living Room";
+			case DINING_ROOM: return "Dining Room";
+			case TOILET: return "Toilet";
+			case BEDROOM: return "Bedroom";
+			case MASTER_BEDROOM: return "Master Bedroom";
+			case BATHROOM: return "Bathroom";
+			case GUEST_ROOM: return "Guest Room";
+			case STUDY: return "Study";
+			case STORAGE: return "Storage";
+			default : return "Undefined";
+			}
+			
+		}
 	}
 	
 	public Room(Rect r, int id, RoomType type)
@@ -31,6 +52,11 @@ public class Room extends Rect
 	public int id()
 	{
 		return id;
+	}
+	
+	public String type()
+	{
+		return type.toString();
 	}
 	
 	

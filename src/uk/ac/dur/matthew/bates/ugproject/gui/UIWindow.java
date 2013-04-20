@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +27,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import uk.ac.dur.matthew.bates.ugproject.model.DoorConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.FloorPlan;
 import uk.ac.dur.matthew.bates.ugproject.model.Line;
 import uk.ac.dur.matthew.bates.ugproject.model.Point;
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
+import uk.ac.dur.matthew.bates.ugproject.model.Room;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
+import uk.ac.dur.matthew.bates.ugproject.model.WallConnection;
 
 import com.google.common.base.Splitter;
 
@@ -49,7 +53,9 @@ public class UIWindow extends JFrame
 	private boolean uShowRoomIDs = true;
 	private boolean uShowRoomAreas = true;
 	private boolean uShowPossibleDoorLocations = true;
-	private boolean uShowWallNormals = true;
+	private boolean uShowWallNormals = false;
+	private boolean uShowRoomTypes = true;
+	private boolean uShowDoorRadius = true;
 
 	private JTextField txtFloorPlanWidth;
 	private JTextField txtFloorPlanHeight;
@@ -60,6 +66,8 @@ public class UIWindow extends JFrame
 	private JCheckBox ckbShowRoomAreas;
 	private JCheckBox ckbShowPossibleDoorLocations;
 	private JCheckBox ckbShowWallNormals;
+	private JCheckBox ckbShowRoomTypes;
+	private JCheckBox ckbShowDoorRadius;
 
 	private JTextField txtRoomAreas;
 
@@ -126,7 +134,7 @@ public class UIWindow extends JFrame
 		optPanel.add(txtFloorPlanAreas);
 
 		ckbShowMinorGridlines = new JCheckBox("Show Minor Gridlines");
-		ckbShowMinorGridlines.setSelected(true);
+		ckbShowMinorGridlines.setSelected(uShowMinorGridlines);
 		ckbShowMinorGridlines.addItemListener(new ItemListener()
 		{
 			@Override
@@ -139,7 +147,7 @@ public class UIWindow extends JFrame
 		optPanel.add(ckbShowMinorGridlines);
 
 		ckbShowMajorGridlines = new JCheckBox("Show Major Gridlines");
-		ckbShowMajorGridlines.setSelected(true);
+		ckbShowMajorGridlines.setSelected(uShowMajorGridlines);
 		ckbShowMajorGridlines.addItemListener(new ItemListener()
 		{
 			@Override
@@ -152,7 +160,7 @@ public class UIWindow extends JFrame
 		optPanel.add(ckbShowMajorGridlines);
 
 		ckbShowRoomIDs = new JCheckBox("Show Room IDs");
-		ckbShowRoomIDs.setSelected(true);
+		ckbShowRoomIDs.setSelected(uShowRoomIDs);
 		ckbShowRoomIDs.addItemListener(new ItemListener()
 		{
 			@Override
@@ -165,7 +173,7 @@ public class UIWindow extends JFrame
 		optPanel.add(ckbShowRoomIDs);
 
 		ckbShowRoomAreas = new JCheckBox("Show Room Areas");
-		ckbShowRoomAreas.setSelected(true);
+		ckbShowRoomAreas.setSelected(uShowRoomAreas);
 		ckbShowRoomAreas.addItemListener(new ItemListener()
 		{
 			@Override
@@ -178,7 +186,7 @@ public class UIWindow extends JFrame
 		optPanel.add(ckbShowRoomAreas);
 
 		ckbShowPossibleDoorLocations = new JCheckBox("Show Possible Door Locations");
-		ckbShowPossibleDoorLocations.setSelected(true);
+		ckbShowPossibleDoorLocations.setSelected(uShowPossibleDoorLocations);
 		ckbShowPossibleDoorLocations.addItemListener(new ItemListener()
 		{
 			@Override
@@ -191,7 +199,7 @@ public class UIWindow extends JFrame
 		optPanel.add(ckbShowPossibleDoorLocations);
 
 		ckbShowWallNormals = new JCheckBox("Show Wall Normals");
-		ckbShowWallNormals.setSelected(true);
+		ckbShowWallNormals.setSelected(uShowWallNormals);
 		ckbShowWallNormals.addItemListener(new ItemListener()
 		{
 			@Override
@@ -203,10 +211,37 @@ public class UIWindow extends JFrame
 		});
 		optPanel.add(ckbShowWallNormals);
 
+		ckbShowRoomTypes = new JCheckBox("Show Room Types");
+		ckbShowRoomTypes.setSelected(uShowRoomTypes);
+		ckbShowRoomTypes.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				uShowRoomTypes = e.getStateChange() == ItemEvent.SELECTED;
+				fpViewer.repaint();
+			}
+		});
+		optPanel.add(ckbShowRoomTypes);
+
+		ckbShowDoorRadius = new JCheckBox("Show Door Radius");
+		ckbShowDoorRadius.setSelected(uShowDoorRadius);
+		ckbShowDoorRadius.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				uShowDoorRadius = e.getStateChange() == ItemEvent.SELECTED;
+				fpViewer.repaint();
+			}
+		});
+		optPanel.add(ckbShowDoorRadius);
+
 		contentPane.add(fpViewer, BorderLayout.CENTER);
 		contentPane.add(optPanel, BorderLayout.EAST);
 
 		setVisible(true);
+		setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private FloorPlan generateFloorPlan()
@@ -366,45 +401,221 @@ public class UIWindow extends JFrame
 					g.drawString(areaLabel, midX - (strw >> 1) + (uShowRoomIDs ? 22 : 0), midY
 							+ (strh / 2) - 3 + (uShowRoomIDs ? 22 : 0));
 				}
+			}
 
-				if (uShowPossibleDoorLocations)
+			if (uShowWallNormals)
+			{
+				g.setStroke(new BasicStroke(1));
+				g.setColor(Color.BLACK);
+				for (Wall l : floorPlan.walls())
 				{
-					g.setStroke(new BasicStroke(1));
-					for (Line l : floorPlan.possibleDoorLocations())
+					Point p = l.midpoint();
+					int px = p.x * scale + scale;
+					int py = p.y * scale + scale;
+					int qx = px + (int) (20 * Math.cos(Math.toRadians(l.orientation() - 90)));
+					int qy = py + (int) (20 * Math.sin(Math.toRadians(l.orientation() - 90)));
+					int ux = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() - 135)));
+					int uy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() - 135)));
+					int vx = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() - 45)));
+					int vy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() - 45)));
+					g.drawLine(px, py, qx, qy);
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_ON);
+					g.drawLine(qx, qy, ux, uy);
+					g.drawLine(qx, qy, vx, vy);
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_OFF);
+				}
+				g.setColor(Color.BLACK);
+				g.setStroke(new BasicStroke(2));
+			}
+
+			if (uShowPossibleDoorLocations)
+			{
+				g.setStroke(new BasicStroke(1));
+				for (WallConnection w : floorPlan.wallConnections())
+				{
+					Line c = w.overlap();
+					int x1 = c.p.x * scale + scale;
+					int y1 = c.p.y * scale + scale;
+					int x2 = c.q.x * scale + scale;
+					int y2 = c.q.y * scale + scale;
+					if (w instanceof DoorConnection)
 					{
-						int x1 = l.p.x * scale + scale;
-						int y1 = l.p.y * scale + scale;
-						int x2 = l.q.x * scale + scale;
-						int y2 = l.q.y * scale + scale;
-						if (l.isHorizontal())
+						if (c.isHorizontal())
 						{
+							Wall a = w.frontFacing();
+							if (a.orientation() == Wall.NORTH)
+							{
+								g.setColor(new Color(0x550000ff, true));
+								g.fillRect(x1, y1 - 5, x2 - x1 - 1, 5);
+								g.setColor(new Color(0x44ff0000, true));
+								g.fillRect(x1, y1, x2 - x1 - 1, 5);
+							}
+							else
+							{
+								g.setColor(new Color(0x550000ff, true));
+								g.fillRect(x1, y1, x2 - x1 - 1, 5);
+								g.setColor(new Color(0x55ff0000, true));
+								g.fillRect(x1, y1 - 5, x2 - x1 - 1, 5);
+							}
+							g.setColor(Color.BLACK);
 							g.drawRect(x1, y1 - 5, x2 - x1 - 1, 9);
 						}
-						if (l.isVertical())
+						if (c.isVertical())
 						{
+							Wall a = w.frontFacing();
+							if (a.orientation() == Wall.EAST)
+							{
+								g.setColor(new Color(0x550000ff, true));
+								g.fillRect(x1, y1, 5, y2 - y1 - 1);
+								g.setColor(new Color(0x55ff0000, true));
+								g.fillRect(x1 - 5, y1, 5, y2 - y1 - 1);
+							}
+							else
+							{
+								g.setColor(new Color(0x550000ff, true));
+								g.fillRect(x1 - 5, y1, 5, y2 - y1 - 1);
+								g.setColor(new Color(0x55ff0000, true));
+								g.fillRect(x1, y1, 5, y2 - y1 - 1);
+							}
+							g.setColor(Color.BLACK);
 							g.drawRect(x1 - 5, y1, 9, y2 - y1 - 1);
 						}
 					}
-					g.setStroke(new BasicStroke(2));
-				}
-
-				if (uShowWallNormals)
-				{
-					g.setStroke(new BasicStroke(1));
-					g.setColor(new Color(0x00AAFF));
-					for (Wall l : floorPlan.walls())
+					else
 					{
-						Point p = l.midpoint();
-						int px = p.x * scale + scale;
-						int py = p.y * scale + scale;
-						g.drawLine(px, py,
-								px + (int) (20 * Math.cos(Math.toRadians(l.angle() - 90))), py
-										+ (int) (20 * Math.sin(Math.toRadians(l.angle() - 90))));
+						g.setColor(new Color(0x66333333, true));
+						if (c.isHorizontal())
+						{
+							g.fillRect(x1, y1 - 5, x2 - x1, 9);
+						}
+						if (c.isVertical())
+						{
+							g.fillRect(x1 - 5, y1, 9, y2 - y1);
+						}
 					}
-					g.setColor(Color.BLACK);
-					g.setStroke(new BasicStroke(2));
+				}
+				g.setStroke(new BasicStroke(2));
+				g.setColor(Color.BLACK);
+			}
+
+			if (uShowDoorRadius)
+			{
+				for (WallConnection wc : floorPlan.wallConnections())
+				{
+					if (wc instanceof DoorConnection)
+					{
+						DoorConnection dw = (DoorConnection) wc;
+						Wall w = dw.backFacing();
+						Line dl = dw.doorPlacement();
+
+						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+								RenderingHints.VALUE_ANTIALIAS_ON);
+						Point pm = dl.midpoint();
+						// g.setColor(new Color(116, 39, 158, 100));
+						Arc2D.Double semiCircle;
+						if (w.orientation() == Wall.NORTH || w.orientation() == Wall.SOUTH)
+						{
+							semiCircle = new Arc2D.Double(pm.x * scale - (int) (1.75 * scaleFactor)
+									+ 1.25 * scale, pm.y * scale - (int) (1.75 * scaleFactor),
+									5.5 * scale, 5.5 * scale, w.orientation(), Math.abs(w
+											.orientation() - 90), Arc2D.PIE);
+							g.setColor(Color.BLACK);
+							g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT,
+									BasicStroke.JOIN_MITER));
+							if (w.orientation() == Wall.NORTH)
+							{
+								g.drawLine(pm.x * scale + scale + (int) (1.25 * scaleFactor), pm.y
+										* scale + scale, pm.x * scale + scale
+										+ (int) (1.25 * scaleFactor), pm.y * scale + scale
+										- (int) (scaleFactor * 2.75));
+							}
+							else
+							{
+								g.drawLine(pm.x * scale + scale + (int) (1.25 * scaleFactor), pm.y
+										* scale + scale, pm.x * scale + scale
+										+ (int) (1.25 * scaleFactor), pm.y * scale + scale
+										+ (int) (scaleFactor * 2.75));
+							}
+						}
+						else
+						{
+							semiCircle = new Arc2D.Double(
+									pm.x * scale - (int) (1.75 * scaleFactor), pm.y * scale
+											- (int) (1.75 * scaleFactor) + 1.25 * scale,
+									5.5 * scale, 5.5 * scale, 90 - w.orientation(),
+									Math.abs(90 - (w.orientation() - 90)), Arc2D.PIE);
+							g.setColor(Color.BLACK);
+							g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT,
+									BasicStroke.JOIN_MITER));
+							if (w.orientation() == Wall.EAST)
+							{
+								g.drawLine(pm.x * scale + scale, pm.y * scale + scale
+										+ (int) (1.25 * scaleFactor), pm.x * scale + scale
+										+ (int) (scaleFactor * 2.75), pm.y * scale + scale
+										+ (int) (1.25 * scaleFactor));
+							}
+							else
+							{
+								g.drawLine(pm.x * scale + scale, pm.y * scale + scale
+										+ (int) (1.25 * scaleFactor), pm.x * scale + scale
+										- (int) (scaleFactor * 2.75), pm.y * scale + scale
+										+ (int) (1.25 * scaleFactor));
+							}
+						}
+						g.setColor(new Color(0x66333333, true));
+						g.fill(semiCircle);
+						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+								RenderingHints.VALUE_ANTIALIAS_OFF);
+					}
 				}
 			}
+
+			if (uShowRoomTypes)
+			{
+				g.setColor(Color.BLACK);
+				for (Room r : floorPlan.rooms())
+				{
+					Point m = r.midpoint();
+					String roomName = r.type().toString();
+					Rectangle2D strBounds = g.getFontMetrics().getStringBounds(roomName, g);
+					int strw = strBounds.getBounds().width;
+					int strh = strBounds.getBounds().height;
+					
+					g.drawString(roomName, m.x*scale + scale - (strw >> 1), m.y*scale + scale - ((uShowRoomAreas || uShowRoomIDs) ? (strw >> 1) : scale*5));
+				}
+			}
+			
+			if (true) // show path nodes
+			{
+				
+			}
+			
+			if (true) // show welders
+			{
+				for (Point p : floorPlan.welders())
+				{
+					
+					g.fillOval(p.x * scale + scale - (int)(((0.35*scaleFactor)/2.0)), p.y * scale + scale - (int)(((0.35*scaleFactor)/2.0)), (int)(0.35*scaleFactor), (int)((0.35*scaleFactor)));
+				}
+			}
+
+			for (WallConnection wc : floorPlan.wallConnections())
+			{
+				if (wc instanceof DoorConnection)
+				{
+					DoorConnection dw = (DoorConnection) wc;
+					Line dl = dw.doorPlacement();
+
+					g.setStroke(new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+					g.setColor(Color.BLACK);
+					g.drawLine(dl.p.x * scale + scale, dl.p.y * scale + scale, dl.q.x * scale
+							+ scale, dl.q.y * scale + scale);
+					g.setStroke(new BasicStroke(1));
+				}
+			}
+
 		}
 	}
 

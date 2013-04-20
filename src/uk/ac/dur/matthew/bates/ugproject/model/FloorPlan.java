@@ -14,6 +14,8 @@ public class FloorPlan
 	private List<Line> mLines;
 	private List<Line> mPossibleDoorLocations;
 	private List<Wall> mWalls;
+	private List<WallConnection> mWallConnections;
+	private List<Room> mRooms;
 
 	public FloorPlan(int width, int height, ArrayList<Double> areas)
 	{
@@ -25,6 +27,14 @@ public class FloorPlan
 	{
 		return new ArrayList<Rect>(mRoomBounds);
 	}
+	
+	public List<Room> rooms()
+	{
+		if (mRooms != null) return mRooms;
+		RoomAllocationRule rule = new RandomStackRoomAllocation();
+		mRooms = rule.allocateRooms(this);
+		return mRooms;
+	}
 
 	public List<Integer> areas()
 	{
@@ -35,7 +45,7 @@ public class FloorPlan
 		}
 		return xs;
 	}
-	
+
 	public List<Wall> walls()
 	{
 		if (mWalls != null) return mWalls;
@@ -49,6 +59,24 @@ public class FloorPlan
 		}
 		mWalls = walls;
 		return walls;
+	}
+	
+	public List<Point> welders()
+	{
+		List<Point> welders = new ArrayList<Point>();
+		for (Rect r : roomBounds())
+		{
+			Point tl = new Point(r.x, r.y);
+			Point tr = new Point(r.x + r.width, r.y);
+			Point bl = new Point(r.x, r.y + r.height);
+			Point br = new Point(r.x + r.width, r.y + r.height);
+			
+			if (tl.x % 4 != 0 || tl.y % 4 != 0) welders.add(tl);
+			if (tr.x % 4 != 0 || tr.y % 4 != 0) welders.add(tr);
+			if (bl.x % 4 != 0 || bl.y % 4 != 0) welders.add(bl);
+			if (br.x % 4 != 0 || br.y % 4 != 0) welders.add(br);
+		}
+		return welders;
 	}
 
 	public List<Line> wallLines()
@@ -83,7 +111,7 @@ public class FloorPlan
 		mPossibleDoorLocations = locations;
 		return locations;
 	}
-	
+
 	public List<Point> doorLocations()
 	{
 		List<Point> doorLocations = new ArrayList<Point>();
@@ -92,6 +120,25 @@ public class FloorPlan
 			doorLocations.add(l.midpoint());
 		}
 		return doorLocations;
+	}
+
+	public List<WallConnection> wallConnections()
+	{
+		if (mWallConnections != null) return new ArrayList<WallConnection>(mWallConnections);
+		List<WallConnection> connections = new ArrayList<WallConnection>();
+		DoorPlacingRule placementRule = new SimpleDoorPlacementRule();
+		for (int i = 0; i < walls().size(); i++)
+		{
+			for (int j = i + 1; j < walls().size(); j++)
+			{
+				Wall a = walls().get(i);
+				Wall b = walls().get(j);
+				WallConnection c = WallConnection.create(a, b, placementRule);
+				if (c != null) connections.add(c);
+			}
+		}
+		mWallConnections = connections;
+		return connections;
 	}
 
 	public int width()

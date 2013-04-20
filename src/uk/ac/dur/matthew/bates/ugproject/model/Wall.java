@@ -37,7 +37,7 @@ public class Wall extends Line
 		this.id = ++current_ID;
 	}
 	
-	public int angle()
+	public int orientation()
 	{
 		return this.orientation;
 	}

@@ -15,8 +15,8 @@ public class WallConnection
 	public static WallConnection create(Wall frontFacing, Wall backFacing, DoorPlacingRule rule)
 	{
 		Line overlap = Line.overlap(frontFacing, backFacing);
-		if (overlap == null) throw new IllegalArgumentException("No connection between walls!");
-		if (overlap.length() < 1) throw new IllegalArgumentException("Not enough overlap to form a connection");
+		if (overlap == null) return null;
+		if (overlap.length() < 1) return null;
 		if (rule.canPlaceDoor(frontFacing, backFacing))
 		{
 			return new DoorConnection(frontFacing, backFacing, rule.getDoorPlacement(frontFacing, backFacing));
@@ -25,5 +25,20 @@ public class WallConnection
 		{
 			return new  WallConnection(frontFacing, backFacing);
 		}
+	}
+	
+	public Wall frontFacing()
+	{
+		return frontFacing;
+	}
+	
+	public Wall backFacing()
+	{
+		return backFacing;
+	}
+	
+	public Line overlap()
+	{
+		return Line.overlap(frontFacing, backFacing);
 	}
 }

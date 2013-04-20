@@ -12,5 +12,19 @@ public class DoorConnection extends WallConnection
 		this.doorPlacement = doorPlacement;
 	}
 	
+	public Line doorPlacement()
+	{
+		return doorPlacement;
+	}
+	
+	public Line leftWallSegment()
+	{
+		return leftWallSegment;
+	}
+	
+	public Line rightWallSegment()
+	{
+		return rightWallSegment;
+	}
 	
 }
