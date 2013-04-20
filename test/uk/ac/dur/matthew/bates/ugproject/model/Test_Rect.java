@@ -19,7 +19,6 @@ public class Test_Rect
 	private Rect rect2;
 	private Rect rect3;
 	private Rect rect4;
-	private Rect rect5;
 	
 	/**
 	 * Creates some common test Rectangles

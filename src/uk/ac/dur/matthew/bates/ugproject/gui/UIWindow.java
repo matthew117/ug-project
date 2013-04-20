@@ -17,8 +17,12 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -30,11 +34,13 @@ import javax.swing.JTextField;
 import uk.ac.dur.matthew.bates.ugproject.model.DoorConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.FloorPlan;
 import uk.ac.dur.matthew.bates.ugproject.model.Line;
+import uk.ac.dur.matthew.bates.ugproject.model.Node;
 import uk.ac.dur.matthew.bates.ugproject.model.Point;
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
 import uk.ac.dur.matthew.bates.ugproject.model.Room;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
 import uk.ac.dur.matthew.bates.ugproject.model.WallConnection;
+import uk.ac.dur.matthew.bates.ugproject.model.Welder;
 
 import com.google.common.base.Splitter;
 
@@ -56,6 +62,9 @@ public class UIWindow extends JFrame
 	private boolean uShowWallNormals = false;
 	private boolean uShowRoomTypes = true;
 	private boolean uShowDoorRadius = true;
+	private boolean uShowPathNodes = true;
+	private boolean uShowWelders = true;
+	private boolean uShowTessellation = true;
 
 	private JTextField txtFloorPlanWidth;
 	private JTextField txtFloorPlanHeight;
@@ -68,8 +77,9 @@ public class UIWindow extends JFrame
 	private JCheckBox ckbShowWallNormals;
 	private JCheckBox ckbShowRoomTypes;
 	private JCheckBox ckbShowDoorRadius;
-
-	private JTextField txtRoomAreas;
+	private JCheckBox ckbShowPathNodes;
+	private JCheckBox ckbShowWelders;
+	private JCheckBox ckbShowTessellation;
 
 	public UIWindow()
 	{
@@ -237,6 +247,45 @@ public class UIWindow extends JFrame
 		});
 		optPanel.add(ckbShowDoorRadius);
 
+		ckbShowPathNodes = new JCheckBox("Show Path Nodes");
+		ckbShowPathNodes.setSelected(uShowPathNodes);
+		ckbShowPathNodes.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				uShowPathNodes = e.getStateChange() == ItemEvent.SELECTED;
+				fpViewer.repaint();
+			}
+		});
+		optPanel.add(ckbShowPathNodes);
+
+		ckbShowWelders = new JCheckBox("Show Welders");
+		ckbShowWelders.setSelected(uShowWelders);
+		ckbShowWelders.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				uShowWelders = e.getStateChange() == ItemEvent.SELECTED;
+				fpViewer.repaint();
+			}
+		});
+		optPanel.add(ckbShowWelders);
+
+		ckbShowTessellation = new JCheckBox("Show Tessellation");
+		ckbShowTessellation.setSelected(uShowTessellation);
+		ckbShowTessellation.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				uShowTessellation = e.getStateChange() == ItemEvent.SELECTED;
+				fpViewer.repaint();
+			}
+		});
+		optPanel.add(ckbShowTessellation);
+
 		contentPane.add(fpViewer, BorderLayout.CENTER);
 		contentPane.add(optPanel, BorderLayout.EAST);
 
@@ -332,6 +381,43 @@ public class UIWindow extends JFrame
 					g.drawLine(0, y, width, y);
 				}
 			}
+			
+			if (uShowPathNodes)
+			{
+				Queue<Node> Q = new ArrayBlockingQueue<Node>(floorPlan.rooms().size());
+				Node v = floorPlan.pathGraph();
+				Set<Node> m = new HashSet<Node>();
+				Q.add(v);
+				m.add(v);
+				g.setColor(Color.BLACK);
+				g.setStroke(new BasicStroke(2));
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+				while (!Q.isEmpty())
+				{
+					Node t = Q.poll();
+
+					int tx = (int) (t.x * scale) + scale;
+					int ty = (int) (t.y * scale) + scale;
+
+						g.drawOval(tx - 10, ty - 10, 20, 20);
+					for (Node e : t.edges())
+					{
+						int ex = (int) (e.x * scale) + scale;
+						int ey = (int) (e.y * scale) + scale;
+						
+						g.drawLine(tx, ty, ex, ey);
+						if (!m.contains(e))
+						{
+							m.add(e);
+							Q.add(e);
+						}
+					}
+				}
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_OFF);
+			}
+
 
 			g.setStroke(new BasicStroke(1));
 			g.setColor(Color.BLUE);
@@ -401,6 +487,8 @@ public class UIWindow extends JFrame
 					g.drawString(areaLabel, midX - (strw >> 1) + (uShowRoomIDs ? 22 : 0), midY
 							+ (strh / 2) - 3 + (uShowRoomIDs ? 22 : 0));
 				}
+
+				g.setFont(defaultFont);
 			}
 
 			if (uShowWallNormals)
@@ -577,27 +665,49 @@ public class UIWindow extends JFrame
 				g.setColor(Color.BLACK);
 				for (Room r : floorPlan.rooms())
 				{
-					Point m = r.midpoint();
+					int x = (int) (r.x * scale) + scale;
+					int y = (int) (r.y * scale) + scale;
+					int w = (int) (r.width * scale);
+					int h = (int) (r.height * scale);
+					int midX = (x + w) - (w >> 1);
+					int midY = (y + h) - (h >> 1);
 					String roomName = r.type().toString();
 					Rectangle2D strBounds = g.getFontMetrics().getStringBounds(roomName, g);
 					int strw = strBounds.getBounds().width;
 					int strh = strBounds.getBounds().height;
-					
-					g.drawString(roomName, m.x*scale + scale - (strw >> 1), m.y*scale + scale - ((uShowRoomAreas || uShowRoomIDs) ? (strw >> 1) : scale*5));
+
+					g.drawString(roomName, midX - (strw >> 1), midY
+							- ((uShowRoomAreas || uShowRoomIDs) ? 25 : (strh >> 1)));
 				}
 			}
-			
-			if (true) // show path nodes
+
+			if (uShowTessellation) // show tesselation
 			{
-				
+
 			}
-			
-			if (true) // show welders
+
+			if (uShowWelders) // show welders
 			{
-				for (Point p : floorPlan.welders())
+				for (Welder welder : floorPlan.welders())
 				{
-					
-					g.fillOval(p.x * scale + scale - (int)(((0.35*scaleFactor)/2.0)), p.y * scale + scale - (int)(((0.35*scaleFactor)/2.0)), (int)(0.35*scaleFactor), (int)((0.35*scaleFactor)));
+					double w = scaleFactor;
+					double h = w;
+					double x = welder.location().x * scale + scale - (w * 0.5);
+					double y = welder.location().y * scale + scale - (h * 0.5);
+					int start = 360 - welder.orientation();
+					int extent = 90;
+
+					Arc2D.Double shape = new Arc2D.Double(x, y, w, h, start, extent, Arc2D.PIE);
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setColor(Color.WHITE);
+					g.fill(shape);
+					g.setColor(Color.BLACK);
+					g.setStroke(new BasicStroke(1));
+					shape = new Arc2D.Double(x, y, w, h, start, extent, Arc2D.OPEN);
+					g.draw(shape);
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_OFF);
 				}
 			}
 
@@ -617,6 +727,7 @@ public class UIWindow extends JFrame
 			}
 
 		}
+
 	}
 
 	class OptionsPanel extends JPanel

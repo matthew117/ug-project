@@ -38,7 +38,6 @@ public class Room extends Rect
 			case STORAGE: return "Storage";
 			default : return "Undefined";
 			}
-			
 		}
 	}
 	
@@ -54,9 +53,9 @@ public class Room extends Rect
 		return id;
 	}
 	
-	public String type()
+	public RoomType type()
 	{
-		return type.toString();
+		return type;
 	}
 	
 	

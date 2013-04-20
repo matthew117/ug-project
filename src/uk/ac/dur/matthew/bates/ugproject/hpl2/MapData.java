@@ -7,6 +7,7 @@ import java.util.List;
 public class MapData
 {
 	// constants
+	@SuppressWarnings("unused")
 	private static final int DEFAULT_GROUP = 0;
 
 	// static fields

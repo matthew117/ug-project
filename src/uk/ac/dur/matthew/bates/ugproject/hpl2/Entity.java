@@ -8,6 +8,7 @@ public class Entity extends StaticObject
 	private boolean staticPhysics = true;
 	private boolean isAffectedByDecal = false;
 	private String callbackFunc;
+	@SuppressWarnings("unused")
 	private List<Entity> connectedProps;
 	private String connectionStateChangedCallback;
 	private boolean fullGameSave = false;

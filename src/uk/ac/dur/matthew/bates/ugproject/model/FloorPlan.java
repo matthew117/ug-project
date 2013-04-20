@@ -3,19 +3,19 @@ package uk.ac.dur.matthew.bates.ugproject.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.ac.dur.matthew.bates.ugproject.model.Line.*;
-
 import uk.ac.dur.matthew.bates.ugproject.generators.Squarify;
+import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 
 public class FloorPlan
 {
 	private List<Double> mAreas;
 	private List<Rect> mRoomBounds;
 	private List<Line> mLines;
-	private List<Line> mPossibleDoorLocations;
 	private List<Wall> mWalls;
 	private List<WallConnection> mWallConnections;
 	private List<Room> mRooms;
+	private List<Wall> mTessellation;
+	private Node mNodeRoot;
 
 	public FloorPlan(int width, int height, ArrayList<Double> areas)
 	{
@@ -27,7 +27,7 @@ public class FloorPlan
 	{
 		return new ArrayList<Rect>(mRoomBounds);
 	}
-	
+
 	public List<Room> rooms()
 	{
 		if (mRooms != null) return mRooms;
@@ -50,7 +50,7 @@ public class FloorPlan
 	{
 		if (mWalls != null) return mWalls;
 		List<Wall> walls = new ArrayList<Wall>();
-		for (Rect r : mRoomBounds)
+		for (Room r : rooms())
 		{
 			walls.add(new Wall(r.top(), r, Wall.SOUTH));
 			walls.add(new Wall(r.right(), r, Wall.WEST));
@@ -60,21 +60,27 @@ public class FloorPlan
 		mWalls = walls;
 		return walls;
 	}
-	
-	public List<Point> welders()
+
+	public List<Welder> welders()
 	{
-		List<Point> welders = new ArrayList<Point>();
-		for (Rect r : roomBounds())
+		List<Welder> welders = new ArrayList<Welder>();
+		for (Room r : rooms())
 		{
+			if (r.type() == RoomType.BATHROOM) continue;
+			if (r.type() == RoomType.STORAGE) continue;
+			if (r.type() == RoomType.PANTRY) continue;
+			if (r.type() == RoomType.TOILET) continue;
+
 			Point tl = new Point(r.x, r.y);
 			Point tr = new Point(r.x + r.width, r.y);
 			Point bl = new Point(r.x, r.y + r.height);
 			Point br = new Point(r.x + r.width, r.y + r.height);
-			
-			if (tl.x % 4 != 0 || tl.y % 4 != 0) welders.add(tl);
-			if (tr.x % 4 != 0 || tr.y % 4 != 0) welders.add(tr);
-			if (bl.x % 4 != 0 || bl.y % 4 != 0) welders.add(bl);
-			if (br.x % 4 != 0 || br.y % 4 != 0) welders.add(br);
+
+			if (tl.x % 2 != 0 || tl.y % 2 != 0) welders.add(new Welder(r, tl, Welder.TOP_LEFT));
+			if (tr.x % 2 != 0 || tr.y % 2 != 0) welders.add(new Welder(r, tr, Welder.TOP_RIGHT));
+			if (bl.x % 2 != 0 || bl.y % 2 != 0) welders.add(new Welder(r, bl, Welder.BOTTOM_LEFT));
+			if (br.x % 2 != 0 || br.y % 2 != 0)
+				welders.add(new Welder(r, br, Welder.BOTTOM_RIGHT));
 		}
 		return welders;
 	}
@@ -94,34 +100,6 @@ public class FloorPlan
 		return lines;
 	}
 
-	public List<Line> possibleDoorLocations()
-	{
-		if (mPossibleDoorLocations != null) return mPossibleDoorLocations;
-		List<Line> locations = new ArrayList<Line>();
-		for (int i = 0; i < wallLines().size(); i++)
-		{
-			for (int j = i + 1; j < wallLines().size(); j++)
-			{
-				Line a = wallLines().get(i);
-				Line b = wallLines().get(j);
-				Line o = overlap(a, b);
-				if (o != null && o.length() >= 4) locations.add(o);
-			}
-		}
-		mPossibleDoorLocations = locations;
-		return locations;
-	}
-
-	public List<Point> doorLocations()
-	{
-		List<Point> doorLocations = new ArrayList<Point>();
-		for (Line l : possibleDoorLocations())
-		{
-			doorLocations.add(l.midpoint());
-		}
-		return doorLocations;
-	}
-
 	public List<WallConnection> wallConnections()
 	{
 		if (mWallConnections != null) return new ArrayList<WallConnection>(mWallConnections);
@@ -139,6 +117,49 @@ public class FloorPlan
 		}
 		mWallConnections = connections;
 		return connections;
+	}
+
+	public List<Wall> tessellation()
+	{
+		return mTessellation;
+	}
+
+	public Node pathGraph()
+	{
+		if (mNodeRoot != null) return mNodeRoot;
+
+		List<Node> nodes = new ArrayList<Node>();
+
+		for (Room r : rooms())
+		{
+			Node n = new Node(r.midpoint(), new ArrayList<Node>());
+			nodes.add(n);
+		}
+
+		for (WallConnection wc : wallConnections())
+		{
+			if (wc instanceof DoorConnection)
+			{
+				DoorConnection dc = (DoorConnection)wc;
+				List<Node> edges = new ArrayList<Node>();
+				Node n = new Node(dc.doorPlacement().midpoint(), edges);
+				if (!nodes.contains(n))
+				{
+					Wall a = dc.frontFacing();
+					Wall b = dc.backFacing();
+					edges.add(nodes.get(a.parent().id()));
+					nodes.get(a.parent().id()).edges().add(n);
+					edges.add(nodes.get(b.parent().id()));
+					nodes.get(b.parent().id()).edges().add(n);
+					nodes.add(n);
+				}
+			}
+		}
+		
+		mNodeRoot = nodes.get(rooms().size());
+
+		return mNodeRoot;
+
 	}
 
 	public int width()
