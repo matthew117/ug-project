@@ -1,8 +1,8 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
-public class SimpleDoorPlacementRule implements DoorPlacingRule
-{
 
+public class SimpleDoorPlacementRule implements DoorPlacingRule
+{	
 	@Override
 	public boolean canPlaceDoor(Wall a, Wall b)
 	{
