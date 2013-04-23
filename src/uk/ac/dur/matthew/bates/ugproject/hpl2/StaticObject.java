@@ -45,7 +45,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
@@ -73,7 +73,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
@@ -101,7 +101,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
@@ -129,7 +129,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
@@ -157,7 +157,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
@@ -185,7 +185,7 @@ public class StaticObject extends Primitive
 			vertexList = new ArrayList<float[]>();
 			try
 			{
-				File file = new File("/Applications/Amnesia.app/Contents/Resources/" + filePath);
+				File file = new File(filePath);
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(file, new ColladaXMLParser(vertexList));
