@@ -160,19 +160,51 @@ public class PathConfig
 	public static final String MANSION_FLOORBOARDS_MATERIAL = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/floor/mansionbase_floor_boards.mat";
 	public static final String TILED_FLOOR_MATERIAL = AMNESIA_RESOURCES_DIR + "/static_objects/castlebase/castlebase_tiledfloor.mat";
 	
-	// Statics Objects
+	// Static_Objects
 	
 	// Walls
-	public static final String MANSION_WALL_RED = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default.dae";
+	public static final String MANSION_WALL_WHITE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default.dae";
+	public static final String MANSION_HALFWALL_WHITE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/short.dae";
+	public static final String MANSION_WALL_WHITE_SECRET = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default_secret.dae";
+	
+	public static final String MANSION_WALL_RED = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default02.dae";
 	public static final String MANSION_HALFWALL_RED = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/short02.dae";
-	public static final String MANSION_WALL_WHITE = AMNESIA_RESOURCES_DIR + "";
-	public static final String MANSION_HALFWALL_WHITE = AMNESIA_RESOURCES_DIR + "";
+	public static final String MANSION_WALL_RED_SECRET = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default02_secret.dae";
+	
+	public static final String MANSION_WALL_EXTENSION = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/default_extension.dae";
+	public static final String MANSION_DOOR_FRAME = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/door_frame.dae";
+	public static final String MANSION_DOORWAY_WHITE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/door_way.dae";
+	public static final String MANSION_DOORWAY_RED = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/door_way02.dae";
 	
 	// Windows
+	public static final String WINDOW02_BLUE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window02_blue.dae";
+	public static final String WINDOW02_LARGE_BLUE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window02_large_blue.dae";
+	public static final String WINDOW02_LARGE_YELLOW = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window02_large_yellow.dae";
+	public static final String WINDOW02_YELLOW = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window02_yellow.dae";
+	public static final String WINDOW03_BLUE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window03_blue.dae";
+	public static final String WINDOW03_YELLOW = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window03_yellow.dae";
+	public static final String WINDOW_BLUE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window_blue.dae";
+	public static final String WINDOW_LARGE_BLUE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window_large_blue.dae";
+	public static final String WINDOW_LARGE_BLUE_SEETHROUGH = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window_large_blue_seethrough.dae";
+	public static final String WINDOW_LARGE_YELLOW = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window_large_yellow.dae";
+	public static final String WINDOW_YELLOW = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/window_yellow.dae";
 	
 	// Ceilings
+	public static final String CEILING_CONCAVE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/ceiling/concave.dae";
+	public static final String CEILING_CONCAVE_SHORT = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/ceiling/concave_short.dae";
+	public static final String CEILING_CORNER = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/ceiling/corner_concave_short.dae";
+	public static final String CIELING_CONVEX = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/ceiling/corner_convex_short.dae";
 	
 	// Welders
+	public static final String PILLAR_WHITE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/pillar02.dae";
+	public static final String WELDER = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/welder.dae";
+	public static final String WLEDER02_CONCAVE = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/welder02_concave.dae";
+	public static final String WELDER02_CONVEX = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/wall/welder02_convex.dae";
+	
+	// Stairs
+	public static final String STAIRS = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/stairs/default.dae";
+	public static final String RAILING = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/stairs/railing.dae";
+	public static final String STAIR_WELDER = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/stairs/welder.dae";
 	
 	// @formatter:on
 }
