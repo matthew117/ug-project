@@ -393,7 +393,10 @@ public class MapData
 		}
 		if (entities.size() == 0)
 		{
-			s += "\n        <Entities />";
+			s += "\n        <Entities>";
+			s += "\n<Area Active=\"true\" AreaType=\"PlayerStart\" Group=\"0\" ID=\"10000\" Mesh=\"\" Name=\"PlayerStart\" Rotation=\"-3.14159 -1.46143 3.14159\" Scale=\"1 1 1\" Tag=\"\" WorldPos=\"1.0 0.5 1.0\">  <UserVariables />\n" + 
+					"</Area>";
+			s += "\n        </Entities>";
 		}
 		else
 		{
@@ -402,6 +405,7 @@ public class MapData
 			{
 				s += "\n            " + ent;
 			}
+			s += "\n<Area Active=\"true\" AreaType=\"PlayerStart\" Group=\"0\" ID=\"2195\" Mesh=\"\" Name=\"PlayerStart\" Rotation=\"-3.14159 -1.46143 3.14159\" Scale=\"1 1 1\" Tag=\"\" WorldPos=\"1.0 4.0 1.0\">";
 			s += "\n        </Entities>";
 		}
 		s += "\n    </MapContents>";

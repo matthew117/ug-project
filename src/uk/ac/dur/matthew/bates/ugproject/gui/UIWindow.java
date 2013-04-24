@@ -294,7 +294,7 @@ public class UIWindow extends JFrame
 			public void actionPerformed(ActionEvent arg0)
 			{
 				MapGenerator mg = new MapGenerator(floorPlan);
-				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "custom_stories/UGProject/map01.map");
+				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "custom_stories/UGProject/maps/map01.map");
 			}
 		});
 		optPanel.add(btnGenerateAmnesiaMap);
