@@ -25,12 +25,14 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig;
 import uk.ac.dur.matthew.bates.ugproject.model.DoorConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.FloorPlan;
 import uk.ac.dur.matthew.bates.ugproject.model.Line;
@@ -51,8 +53,8 @@ public class UIWindow extends JFrame
 
 	private FloorPlan floorPlan;
 
-	private int uFloorPlanWidth = 80;
-	private int uFloorPlanHeight = 50;
+	private int uFloorPlanWidth = 48;
+	private int uFloorPlanHeight = 36;
 	private List<Double> uDefinedRoomAreas;
 	private boolean uShowMinorGridlines = true;
 	private boolean uShowMajorGridlines = true;
@@ -80,6 +82,7 @@ public class UIWindow extends JFrame
 	private JCheckBox ckbShowPathNodes;
 	private JCheckBox ckbShowWelders;
 	private JCheckBox ckbShowTessellation;
+	private JButton btnGenerateAmnesiaMap;
 
 	public UIWindow()
 	{
@@ -283,6 +286,18 @@ public class UIWindow extends JFrame
 			}
 		});
 		optPanel.add(ckbShowTessellation);
+		
+		btnGenerateAmnesiaMap = new JButton("Generate HPL2 Map");
+		btnGenerateAmnesiaMap.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				MapGenerator mg = new MapGenerator(floorPlan);
+				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "custom_stories/UGProject/map01.map");
+			}
+		});
+		optPanel.add(btnGenerateAmnesiaMap);
 
 		contentPane.add(fpViewer, BorderLayout.CENTER);
 		contentPane.add(optPanel, BorderLayout.EAST);

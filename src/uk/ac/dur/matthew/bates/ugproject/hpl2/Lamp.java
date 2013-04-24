@@ -2,6 +2,12 @@ package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 public class Lamp extends Entity
 {
+	public Lamp(String filePath)
+	{
+		super(filePath);
+		// TODO Auto-generated constructor stub
+	}
+
 	private boolean lit = true;
 	private String connectedLight;
 	private float connectionLightAmount = 1.0f;

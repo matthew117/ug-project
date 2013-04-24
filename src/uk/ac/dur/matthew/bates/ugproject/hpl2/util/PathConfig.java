@@ -1,5 +1,7 @@
 package uk.ac.dur.matthew.bates.ugproject.hpl2.util;
 
+import uk.ac.dur.matthew.bates.ugproject.hpl2.Entity;
+
 public class PathConfig
 {
 	// @formatter:off
@@ -68,7 +70,6 @@ public class PathConfig
 	public static final String SHOVEL = AMNESIA_RESOURCES_DIR + "entities/tool/shovel/shovel.ent";
 	public static final String BUCKET = AMNESIA_RESOURCES_DIR + "entities/item/wooden_bucket/wooden_bucket.ent";
 	public static final String BADMINTOM_RACKET = AMNESIA_RESOURCES_DIR + "entities/ptest/badminton_racket/badminton_racket.ent";
-	public static final String BARREL02 = AMNESIA_RESOURCES_DIR + "entities/ptest/barrel02/barrel02.ent";
 	
 	// Bedroom
 	public static final String BED_NICE = AMNESIA_RESOURCES_DIR + "entities/furniture/bed_nice/bed_nice.ent";
@@ -207,4 +208,12 @@ public class PathConfig
 	public static final String STAIR_WELDER = AMNESIA_RESOURCES_DIR + "static_objects/mansionbase/stairs/welder.dae";
 	
 	// @formatter:on
+	
+	public static void main(String[] args)
+	{
+		Entity so = new Entity(TOILET);
+		System.out.println(so.getWidth());
+		System.out.println(so.getHeight());
+		System.out.println(so.getDepth());
+	}
 }

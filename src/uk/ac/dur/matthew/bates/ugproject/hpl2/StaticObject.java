@@ -17,7 +17,7 @@ public class StaticObject extends Primitive
 	private String filePath;
 
 	// cached vertex list
-	private List<float[]> vertexList;
+	protected List<float[]> vertexList;
 
 	public StaticObject()
 	{
@@ -40,21 +40,7 @@ public class StaticObject extends Primitive
 
 	public float getMaxX()
 	{
-		if (vertexList == null)
-		{
-			vertexList = new ArrayList<float[]>();
-			try
-			{
-				File file = new File(filePath);
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-				SAXParser saxParser = factory.newSAXParser();
-				saxParser.parse(file, new ColladaXMLParser(vertexList));
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
+		loadVertexList(filePath);
 		float currentMax = 0;
 		for (float[] xs : vertexList)
 		{
@@ -66,7 +52,7 @@ public class StaticObject extends Primitive
 		return currentMax;
 	}
 
-	public float getMinX()
+	protected void loadVertexList(String filePath)
 	{
 		if (vertexList == null)
 		{
@@ -83,6 +69,11 @@ public class StaticObject extends Primitive
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public float getMinX()
+	{
+		loadVertexList(filePath);
 		float currentMin = Float.MAX_VALUE;
 		for (float[] xs : vertexList)
 		{
@@ -96,21 +87,7 @@ public class StaticObject extends Primitive
 
 	public float getMaxY()
 	{
-		if (vertexList == null)
-		{
-			vertexList = new ArrayList<float[]>();
-			try
-			{
-				File file = new File(filePath);
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-				SAXParser saxParser = factory.newSAXParser();
-				saxParser.parse(file, new ColladaXMLParser(vertexList));
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
+		loadVertexList(filePath);
 		float currentMax = 0;
 		for (float[] xs : vertexList)
 		{
@@ -124,21 +101,7 @@ public class StaticObject extends Primitive
 
 	public float getMinY()
 	{
-		if (vertexList == null)
-		{
-			vertexList = new ArrayList<float[]>();
-			try
-			{
-				File file = new File(filePath);
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-				SAXParser saxParser = factory.newSAXParser();
-				saxParser.parse(file, new ColladaXMLParser(vertexList));
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
+		loadVertexList(filePath);
 		float currentMin = Float.MAX_VALUE;
 		for (float[] xs : vertexList)
 		{
@@ -152,21 +115,7 @@ public class StaticObject extends Primitive
 
 	public float getMaxZ()
 	{
-		if (vertexList == null)
-		{
-			vertexList = new ArrayList<float[]>();
-			try
-			{
-				File file = new File(filePath);
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-				SAXParser saxParser = factory.newSAXParser();
-				saxParser.parse(file, new ColladaXMLParser(vertexList));
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
+		loadVertexList(filePath);
 		float currentMax = 0;
 		for (float[] xs : vertexList)
 		{
@@ -180,21 +129,7 @@ public class StaticObject extends Primitive
 
 	public float getMinZ()
 	{
-		if (vertexList == null)
-		{
-			vertexList = new ArrayList<float[]>();
-			try
-			{
-				File file = new File(filePath);
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-				SAXParser saxParser = factory.newSAXParser();
-				saxParser.parse(file, new ColladaXMLParser(vertexList));
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
-		}
+		loadVertexList(filePath);
 		float currentMin = Float.MAX_VALUE;
 		for (float[] xs : vertexList)
 		{
@@ -204,6 +139,21 @@ public class StaticObject extends Primitive
 			}
 		}
 		return currentMin;
+	}
+	
+	public float getWidth()
+	{
+		return getMaxX() - getMinX();
+	}
+	
+	public float getHeight()
+	{
+		return getMaxY() - getMinY();
+	}
+	
+	public float getDepth()
+	{
+		return getMaxZ() - getMinZ();
 	}
 
 	public boolean doesCastShadows()

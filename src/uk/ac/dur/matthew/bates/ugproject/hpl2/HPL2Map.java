@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PrettyPrinter;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.SimpleRoom;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.TessellatedWall;
@@ -34,6 +35,26 @@ public class HPL2Map
 		s += "\n" + mapData;
 		s += "\n</Level>";
 		return s;
+	}
+
+	public EditorSession getEditorSession()
+	{
+		return editorSession;
+	}
+
+	public void setEditorSession(EditorSession editorSession)
+	{
+		this.editorSession = editorSession;
+	}
+
+	public MapData getMapData()
+	{
+		return mapData;
+	}
+
+	public void setMapData(MapData mapData)
+	{
+		this.mapData = mapData;
 	}
 
 	public void writeToFile(String filePath)
@@ -91,7 +112,7 @@ public class HPL2Map
 
 		for (StaticObject o : objs1)
 		{
-			// ¯map.mapData.addStaticObject(o);
+			// map.mapData.addStaticObject(o);
 		}
 
 		float width = Math.abs(s.getMaxX() - s.getMinX());
@@ -103,11 +124,10 @@ public class HPL2Map
 		plane.setWorldPos(new float[] { 0, 0, 0 });
 		map.mapData.addPrimitive(plane);
 
-		Lamp l = new Lamp();
-		l.setFilePath("entities/lamp/candlestick01/candlestick01.ent");
+		Lamp l = new Lamp(PathConfig.CANDLESTICK_WALL);
 		 map.mapData.addEntity(l);
 
-		Door d = new Door();
+		Door d = new Door(MANSION_DOOR);
 		d.setFilePath(MANSION_DOOR);
 		 map.mapData.addEntity(d);
 

@@ -2,6 +2,12 @@ package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
 public class Door extends Entity
 {
+	public Door(String filePath)
+	{
+		super(filePath);
+		// TODO Auto-generated constructor stub
+	}
+
 	private boolean locked = false;
 	private float openAmount = 0.0f;
 	private boolean disableBreakable = false;

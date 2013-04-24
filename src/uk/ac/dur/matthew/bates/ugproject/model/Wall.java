@@ -2,10 +2,10 @@ package uk.ac.dur.matthew.bates.ugproject.model;
 
 public class Wall extends Line
 {
-	public static final int NORTH = 0;
-	public static final int EAST = 90;
-	public static final int SOUTH = 180;
-	public static final int WEST = 270;
+	public static final int NORTH = 180;
+	public static final int EAST = 270;
+	public static final int SOUTH = 0;
+	public static final int WEST = 90;
 	
 	private Room parent;
 	private int orientation;
