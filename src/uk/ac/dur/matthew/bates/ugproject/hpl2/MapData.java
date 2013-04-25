@@ -22,6 +22,8 @@ public class MapData
 	private List<Primitive> primitives;
 	private List<Decal> decals;
 	private List<Entity> entities;
+	private List<Area> areas;
+	private List<Light> lights;
 
 	private boolean fogActive = false;
 	private double[] fogColor = { 1, 1, 1, 1 };
@@ -45,6 +47,8 @@ public class MapData
 		primitives = new ArrayList<Primitive>();
 		decals = new ArrayList<Decal>();
 		entities = new ArrayList<Entity>();
+		areas = new ArrayList<Area>();
+		lights = new ArrayList<Light>();
 	}
 	
 	public int addStaticObject(StaticObject obj)
@@ -117,6 +121,28 @@ public class MapData
 		entities.add(obj);
 
 		return obj.getId();
+	}
+	
+	public int addArea(Area a)
+	{
+		a.setId(nextID++);
+		String type = a.getAreaType();
+		int n = 0;
+		for (Area t : areas)
+		{
+			if (t.getAreaType().equals(type)) n++;
+		}
+		a.setName(type + "_" + n);
+		areas.add(a);
+		return a.getId();
+	}
+	
+	public int addLight(Light l)
+	{
+		l.setId(nextID++);
+		l.setName("Light_" + lights.size());
+		lights.add(l);
+		return l.getId();
 	}
 
 	public ArrayList<String> getFileIndexStaticObjects()
@@ -314,7 +340,7 @@ public class MapData
 		s += "SkyBoxColor=\"" + skyBoxColor[0] + " " + skyBoxColor[1] + " " + skyBoxColor[2] + " " + skyBoxColor[3] + "\" ";
 		s += "SkyBoxTexture=\"" + (skyBoxTexture != null ? skyBoxTexture : "") + "\">";
 		s += "\n    <MapContents>";
-		if (fileIndexStaticObjects.size() == 0)
+		if (fileIndexStaticObjects.isEmpty())
 		{
 			s += "\n        <FileIndex_StaticObjects NumOfFiles=\"" + fileIndexStaticObjects.size() + "\" />";
 		}
@@ -328,7 +354,7 @@ public class MapData
 			}
 			s += "\n        </FileIndex_StaticObjects>";
 		}
-		if (fileIndexEntities.size() == 0)
+		if (fileIndexEntities.isEmpty())
 		{
 			s += "\n        <FileIndex_Entities NumOfFiles=\"" + fileIndexEntities.size() + "\" />";
 		}
@@ -342,7 +368,7 @@ public class MapData
 			}
 			s += "\n        </FileIndex_Entities>";
 		}
-		if (fileIndexDecals.size() == 0)
+		if (fileIndexDecals.isEmpty())
 		{
 			s += "\n        <FileIndex_Decals NumOfFiles=\"" + fileIndexDecals.size() + "\" />";
 		}
@@ -356,7 +382,7 @@ public class MapData
 			}
 			s += "\n        </FileIndex_Decals>";
 		}
-		if (staticObjects.size() == 0)
+		if (staticObjects.isEmpty())
 		{
 			s += "\n        <StaticObjects />";
 		}
@@ -369,7 +395,7 @@ public class MapData
 			}
 			s += "\n        </StaticObjects>";
 		}
-		if (primitives.size() == 0)
+		if (primitives.isEmpty())
 		{
 			s += "\n        <Primitives />";
 		}
@@ -382,7 +408,7 @@ public class MapData
 			}
 			s += "\n        </Primitives>";
 		}
-		if (decals.size() == 0)
+		if (decals.isEmpty())
 		{
 			s += "\n        <Decals />";
 		}
@@ -391,12 +417,9 @@ public class MapData
 			s += "\n        <Decals>";
 			s += "\n        </Decals>";
 		}
-		if (entities.size() == 0)
+		if (entities.isEmpty() && areas.isEmpty() && lights.isEmpty())
 		{
-			s += "\n        <Entities>";
-			s += "\n<Area Active=\"true\" AreaType=\"PlayerStart\" Group=\"0\" ID=\"10000\" Mesh=\"\" Name=\"PlayerStart\" Rotation=\"-3.14159 -1.46143 3.14159\" Scale=\"1 1 1\" Tag=\"\" WorldPos=\"1.0 0.5 1.0\">  <UserVariables />\n" + 
-					"</Area>";
-			s += "\n        </Entities>";
+			s += "\n<Entities />";
 		}
 		else
 		{
@@ -405,7 +428,14 @@ public class MapData
 			{
 				s += "\n            " + ent;
 			}
-			s += "\n<Area Active=\"true\" AreaType=\"PlayerStart\" Group=\"0\" ID=\"2195\" Mesh=\"\" Name=\"PlayerStart\" Rotation=\"-3.14159 -1.46143 3.14159\" Scale=\"1 1 1\" Tag=\"\" WorldPos=\"1.0 4.0 1.0\">";
+			for (Area a : areas)
+			{
+				s += "\n            " + a;
+			}
+			for (Light l : lights)
+			{
+				s += "\n            " + l;
+			}
 			s += "\n        </Entities>";
 		}
 		s += "\n    </MapContents>";

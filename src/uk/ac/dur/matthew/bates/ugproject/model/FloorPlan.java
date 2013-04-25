@@ -27,6 +27,11 @@ public class FloorPlan
 		mRoomBounds = Squarify.squarify(areas, new RectF(0, 0, width, height));
 	}
 
+	public FloorPlan(List<Rect> roomBounds)
+	{
+		mRoomBounds = roomBounds;
+	}
+
 	public List<Rect> roomBounds()
 	{
 		return new ArrayList<Rect>(mRoomBounds);
@@ -295,6 +300,190 @@ public class FloorPlan
 			}
 		}
 		return m;
+	}
+
+	public int numberOfTessellationProblems()
+	{
+		int sum = 0;
+		for (int i = 0; i < tessellation().size() - 1; i++)
+		{
+			Wall t = tessellation().get(i);
+			for (int j = i + 1; j < tessellation().size(); j++)
+			{
+				Wall s = tessellation().get(j);
+				if (!s.equals(t))
+				{
+					Line v = Line.overlap(t, s);
+					if (s.isHorizontal() && t.isHorizontal() && s.orientation() == t.orientation())
+					{
+						if (v != null && v.length() >= 1) sum++;
+					}
+					else if (s.isVertical() && t.isVertical() && s.orientation() == t.orientation())
+					{
+						if (v != null && v.length() >= 1) sum++;
+					}
+					else
+					{
+						// if (v != null && v.length() >= 1) sum++;
+					}
+				}
+			}
+		}
+		return sum;
+	}
+
+	public FloorPlan normalizeRoomSizes()
+	{
+		FloorPlan nFP = new FloorPlan(this.width(), this.height(), new ArrayList<Double>(mAreas));
+		for (int i = 0; i < nFP.roomBounds().size(); i++)
+		{
+			Rect r = nFP.roomBounds().get(i);
+			if (r.width % 2 != 0) nFP = increaseWidthOfRoomByID(i);
+			if (r.height % 2 != 0) nFP = increaseHeightOfRoomByID(i);
+		}
+		return nFP;
+	}
+
+	public int getIDByRoomBound(Rect r)
+	{
+		return roomBounds().indexOf(r);
+	}
+
+	public FloorPlan increaseWidthOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyRightOf(b, a)) newFP = increaseXOfRoomByID(i);
+		}
+		a.width++;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan increaseXOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyRightOf(b, a)) newFP = increaseXOfRoomByID(i);
+		}
+		a.x++;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan decreaseWidthOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyRightOf(b, a)) newFP = decreaseXOfRoomByID(i);
+		}
+		a.width--;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan decreaseXOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyRightOf(b, a)) newFP = decreaseXOfRoomByID(i);
+		}
+		a.x--;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan increaseHeightOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyBelow(b, a)) newFP = increaseYOfRoomByID(i);
+		}
+		a.height++;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan increaseYOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyBelow(b, a)) newFP = increaseYOfRoomByID(i);
+		}
+		a.y++;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan decreaseHeightOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyBelow(b, a)) newFP = decreaseYOfRoomByID(i);
+		}
+		a.height--;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public FloorPlan decreaseYOfRoomByID(int roomID)
+	{
+		if (roomID > roomBounds().size() || roomID < 0) return this;
+		List<Rect> rb = new ArrayList<Rect>(roomBounds());
+		Rect a = rb.get(roomID);
+		FloorPlan newFP = new FloorPlan(rb);
+		for (int i = 0; i < rb.size(); i++)
+		{
+			Rect b = rb.get(i);
+			if (!a.equals(b) && FeatureDetection.isDirectlyBelow(b, a)) newFP = decreaseYOfRoomByID(i);
+		}
+		a.y--;
+		newFP.mAreas = this.mAreas;
+		return newFP;
+	}
+
+	public Rect getSelected(int x, int y)
+	{
+		for (Rect r : roomBounds())
+		{
+			if (r.contains(x, y)) return r;
+		}
+		return null;
 	}
 
 	public int width()

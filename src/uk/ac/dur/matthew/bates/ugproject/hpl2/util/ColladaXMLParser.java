@@ -16,8 +16,11 @@ public class ColladaXMLParser extends DefaultHandler
 	private boolean source = false;
 	private boolean float_array = false;
 	private boolean scale = false;
+	@SuppressWarnings("unused")
 	private boolean rotateX = false;
+	@SuppressWarnings("unused")
 	private boolean rotateY = false;
+	@SuppressWarnings("unused")
 	private boolean rotateZ = false;
 	
 	private float[] scaleFactor = {1.0f, 1.0f, 1.0f};

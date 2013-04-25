@@ -13,6 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -68,6 +72,8 @@ public class UIWindow extends JFrame
 	private boolean uShowWelders = true;
 	private boolean uShowTessellation = true;
 
+	private Rect mSelectedRoom;
+
 	private JTextField txtFloorPlanWidth;
 	private JTextField txtFloorPlanHeight;
 	private JTextField txtFloorPlanAreas;
@@ -82,6 +88,7 @@ public class UIWindow extends JFrame
 	private JCheckBox ckbShowPathNodes;
 	private JCheckBox ckbShowWelders;
 	private JCheckBox ckbShowTessellation;
+	private JButton btnNormalize;
 	private JButton btnGenerateAmnesiaMap;
 
 	public UIWindow()
@@ -103,7 +110,7 @@ public class UIWindow extends JFrame
 		optPanel.setLayout(new BoxLayout(optPanel, BoxLayout.Y_AXIS));
 
 		optPanel.add(new JLabel("FloorPlan Width"));
-		txtFloorPlanWidth = new JTextField("80", 5);
+		txtFloorPlanWidth = new JTextField("48", 5);
 		txtFloorPlanWidth.setMaximumSize(new Dimension(txtFloorPlanWidth.getPreferredSize().width, txtFloorPlanWidth
 				.getPreferredSize().height));
 		txtFloorPlanWidth.addActionListener(new ActionListener()
@@ -117,7 +124,7 @@ public class UIWindow extends JFrame
 		optPanel.add(txtFloorPlanWidth);
 
 		optPanel.add(new JLabel("FloorPlan Height"));
-		txtFloorPlanHeight = new JTextField("50", 5);
+		txtFloorPlanHeight = new JTextField("36", 5);
 		txtFloorPlanHeight.setMaximumSize(new Dimension(txtFloorPlanHeight.getPreferredSize().width, txtFloorPlanHeight
 				.getPreferredSize().height));
 		txtFloorPlanHeight.addActionListener(new ActionListener()
@@ -286,7 +293,21 @@ public class UIWindow extends JFrame
 			}
 		});
 		optPanel.add(ckbShowTessellation);
-		
+
+		btnNormalize = new JButton("Normalize Tessellation");
+		btnNormalize.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				floorPlan = floorPlan.normalizeRoomSizes();
+				txtFloorPlanHeight.setText("" + floorPlan.height());
+				txtFloorPlanWidth.setText("" + floorPlan.width());
+				repaint();
+			}
+		});
+		optPanel.add(btnNormalize);
+
 		btnGenerateAmnesiaMap = new JButton("Generate HPL2 Map");
 		btnGenerateAmnesiaMap.addActionListener(new ActionListener()
 		{
@@ -294,7 +315,7 @@ public class UIWindow extends JFrame
 			public void actionPerformed(ActionEvent arg0)
 			{
 				MapGenerator mg = new MapGenerator(floorPlan);
-				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "custom_stories/UGProject/maps/map01.map");
+				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "maps/UGProject/maps/map01.map");
 			}
 		});
 		optPanel.add(btnGenerateAmnesiaMap);
@@ -313,7 +334,7 @@ public class UIWindow extends JFrame
 		for (int i = 1; i <= 9; i++)
 		{
 			if (i > 6) roomAreas.add((double) (r.nextInt(2) + 3));
-			else roomAreas.add((double) (r.nextInt(6) + 5));
+			else roomAreas.add((double) (r.nextInt(3) + 4));
 		}
 		Collections.shuffle(roomAreas);
 		return new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) roomAreas);
@@ -321,8 +342,6 @@ public class UIWindow extends JFrame
 
 	protected void reloadFloorPlan()
 	{
-		System.out.println("Regenerating Floor Plan");
-
 		uFloorPlanWidth = Integer.parseInt(txtFloorPlanWidth.getText());
 		uFloorPlanHeight = Integer.parseInt(txtFloorPlanHeight.getText());
 		uDefinedRoomAreas = new ArrayList<Double>();
@@ -333,12 +352,105 @@ public class UIWindow extends JFrame
 		}
 
 		floorPlan = new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) uDefinedRoomAreas);
-
+		mSelectedRoom = null;
 		fpViewer.repaint();
 	}
 
 	class FloorPlanViewer extends JPanel
 	{
+		public FloorPlanViewer()
+		{
+			setFocusable(true);
+
+			addMouseListener(new MouseListener()
+			{
+				@Override
+				public void mouseReleased(MouseEvent e)
+				{
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e)
+				{
+					int floorplanWidth = floorPlan.width();
+					int floorplanHeight = floorPlan.height();
+
+					double widthRatio = (double) (getWidth() - (getWidth() / floorplanWidth)) / (double) floorplanWidth;
+					double heightRatio = (double) (getHeight() - (getHeight() / floorplanHeight))
+							/ (double) floorplanHeight;
+					double scaleFactor = heightRatio < widthRatio ? heightRatio : widthRatio;
+					int scale = (int) scaleFactor;
+
+					int x = (int) (e.getX() / scaleFactor - 1);
+					int y = (int) (e.getY() / scaleFactor - 1);
+
+					mSelectedRoom = floorPlan.getSelected(x, y);
+					repaint();
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e)
+				{
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e)
+				{
+					requestFocus();
+				}
+
+				@Override
+				public void mouseClicked(MouseEvent e)
+				{
+				}
+			});
+
+			addKeyListener(new KeyListener()
+			{
+				@Override
+				public void keyTyped(KeyEvent e)
+				{
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e)
+				{
+				}
+
+				@Override
+				public void keyPressed(KeyEvent e)
+				{
+					switch (e.getKeyCode())
+					{
+					case KeyEvent.VK_LEFT:
+						floorPlan = floorPlan.decreaseWidthOfRoomByID(floorPlan.getIDByRoomBound(mSelectedRoom));
+						break;
+					case KeyEvent.VK_RIGHT:
+						floorPlan = floorPlan.increaseWidthOfRoomByID(floorPlan.getIDByRoomBound(mSelectedRoom));
+						break;
+					case KeyEvent.VK_UP:
+						floorPlan = floorPlan.decreaseHeightOfRoomByID(floorPlan.getIDByRoomBound(mSelectedRoom));
+						break;
+					case KeyEvent.VK_DOWN:
+						floorPlan = floorPlan.increaseHeightOfRoomByID(floorPlan.getIDByRoomBound(mSelectedRoom));
+						break;
+					case KeyEvent.VK_N:
+						System.out.println(floorPlan.welders().size());
+						System.out.println(floorPlan.numberOfTessellationProblems());
+						floorPlan = floorPlan.normalizeRoomSizes();
+						System.out.println(floorPlan.welders().size());
+						System.out.println(floorPlan.numberOfTessellationProblems());
+						break;
+					default:
+						break;
+					}
+					txtFloorPlanHeight.setText("" + floorPlan.height());
+					txtFloorPlanWidth.setText("" + floorPlan.width());
+					repaint();
+				}
+			});
+		}
+
 		@Override
 		public void paint(Graphics context)
 		{
@@ -362,6 +474,17 @@ public class UIWindow extends JFrame
 
 			int displayWidth = (int) (floorplanWidth * scaleFactor);
 			int displayHeight = (int) (floorplanHeight * scaleFactor);
+
+			if (mSelectedRoom != null)
+			{
+				int x = mSelectedRoom.x * scale + scale;
+				int y = mSelectedRoom.y * scale + scale;
+				int w = mSelectedRoom.width * scale;
+				int h = mSelectedRoom.height * scale;
+
+				g.setColor(Color.LIGHT_GRAY);
+				g.fillRect(x, y, w, h);
+			}
 
 			if (uShowMinorGridlines)
 			{
@@ -501,12 +624,12 @@ public class UIWindow extends JFrame
 					Point p = l.midpoint();
 					int px = p.x * scale + scale;
 					int py = p.y * scale + scale;
-					int qx = px + (int) (20 * Math.cos(Math.toRadians(l.orientation() - 90)));
-					int qy = py + (int) (20 * Math.sin(Math.toRadians(l.orientation() - 90)));
-					int ux = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() - 135)));
-					int uy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() - 135)));
-					int vx = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() - 45)));
-					int vy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() - 45)));
+					int qx = px + (int) (20 * Math.cos(Math.toRadians(l.orientation() + 90)));
+					int qy = py + (int) (20 * Math.sin(Math.toRadians(l.orientation() + 90)));
+					int ux = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() + 135)));
+					int uy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() + 135)));
+					int vx = qx - (int) (5 * Math.cos(Math.toRadians(l.orientation() + 45)));
+					int vy = qy - (int) (5 * Math.sin(Math.toRadians(l.orientation() + 45)));
 					g.drawLine(px, py, qx, qy);
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					g.drawLine(qx, qy, ux, uy);
@@ -599,13 +722,12 @@ public class UIWindow extends JFrame
 
 						g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						Point pm = dl.midpoint();
-						// g.setColor(new Color(116, 39, 158, 100));
 						Arc2D.Double semiCircle;
 						if (w.orientation() == Wall.NORTH || w.orientation() == Wall.SOUTH)
 						{
 							semiCircle = new Arc2D.Double(pm.x * scale - (int) (1.75 * scaleFactor) + 1.25 * scale,
 									pm.y * scale - (int) (1.75 * scaleFactor), 5.5 * scale, 5.5 * scale,
-									w.orientation(), Math.abs(w.orientation() - 90), Arc2D.PIE);
+									w.flippedOrientation(), Math.abs(w.flippedOrientation() - 90), Arc2D.PIE);
 							g.setColor(Color.BLACK);
 							g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
 							if (w.orientation() == Wall.NORTH)
@@ -625,7 +747,7 @@ public class UIWindow extends JFrame
 						{
 							semiCircle = new Arc2D.Double(pm.x * scale - (int) (1.75 * scaleFactor), pm.y * scale
 									- (int) (1.75 * scaleFactor) + 1.25 * scale, 5.5 * scale, 5.5 * scale,
-									90 - w.orientation(), Math.abs(90 - (w.orientation() - 90)), Arc2D.PIE);
+									90 - w.flippedOrientation(), Math.abs(90 - (w.flippedOrientation() - 90)), Arc2D.PIE);
 							g.setColor(Color.BLACK);
 							g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
 							if (w.orientation() == Wall.EAST)
