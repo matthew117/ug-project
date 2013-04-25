@@ -51,6 +51,27 @@ public class MapData
 		lights = new ArrayList<Light>();
 	}
 	
+	public int addObject(Primitive obj)
+	{
+		if (obj instanceof Entity)
+		{
+			return addEntity((Entity) obj);
+		}
+		if (obj instanceof StaticObject)
+		{
+			return addStaticObject((StaticObject) obj);
+		}
+		if (obj instanceof Light)
+		{
+			return addLight((Light) obj);
+		}
+		if (obj instanceof Area)
+		{
+			return addArea((Area) obj);
+		}
+		return addPrimitive(obj);
+	}
+	
 	public int addStaticObject(StaticObject obj)
 	{
 		String filePath = obj.getFilePath();

@@ -34,28 +34,71 @@ public class MapGenerator
 		generateWalls();
 		placeDoors();
 	}
-	
+
 	private void placeDoors()
 	{
-		// TODO save position and orientation stuff in variables
-		// TODO detect room type
 		for (DoorConnection d : fp.doorConnections())
 		{
-			StaticObject a = new StaticObject(PathConfig.MANSION_DOORWAY_RED);
-			a.setWorldPos(new float[]{d.doorPlacement().midpoint().x,0,d.doorPlacement().midpoint().y});
-			a.setRotation(new float[]{0,d.frontFacing().orientation(),0});
+			float x = d.doorPlacement().midpoint().x;
+			float y = d.doorPlacement().midpoint().y;
+			int front = d.frontFacing().orientation();
+			int back = d.backFacing().orientation();
+
+			StaticObject a = new StaticObject(getDoorWayModelByType(d.frontFacing().parent().type()));
+			a.setWorldPos(new float[] { x, 0, y });
+			a.setRotation(new float[] { 0, back, 0 });
 			this.map.getMapData().addStaticObject(a);
-			
-			StaticObject b = new StaticObject(PathConfig.MANSION_DOOR_FRAME);
-			b.setWorldPos(new float[]{d.doorPlacement().midpoint().x,0,d.doorPlacement().midpoint().y});
-			b.setRotation(new float[]{0,d.frontFacing().orientation(),0});
+
+			StaticObject b = new StaticObject(getDoorWayModelByType(d.backFacing().parent().type()));
+			b.setWorldPos(new float[] { x, 0, y });
+			b.setRotation(new float[] { 0, front, 0 });
 			this.map.getMapData().addStaticObject(b);
-			
+
+			StaticObject f = new StaticObject(PathConfig.MANSION_DOOR_FRAME);
+			f.setWorldPos(new float[] { x, 0, y });
+			f.setRotation(new float[] { 0, front, 0 });
+			this.map.getMapData().addStaticObject(f);
+
 			Door c = new Door(PathConfig.DOOR_MANSION);
-			c.setWorldPos(new float[]{d.doorPlacement().midpoint().x,0,d.doorPlacement().midpoint().y});
-			c.setRotation(new float[]{0,d.backFacing().orientation(),0});
+			c.setWorldPos(new float[] { x, 0, y });
+			c.setRotation(new float[] { 0, back, 0 });
 			c.setCollides(true);
 			this.map.getMapData().addEntity(c);
+		}
+	}
+
+	private String getDoorWayModelByType(RoomType t)
+	{
+		switch (t)
+		{
+		case BATHROOM:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case BEDROOM:
+			return PathConfig.MANSION_DOORWAY_RED;
+		case DINING_ROOM:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case FOYER:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case GUEST_ROOM:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case KITCHEN:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case LAUNDRY:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case LIVING_ROOM:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case MASTER_BEDROOM:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case PANTRY:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case STORAGE:
+			return PathConfig.MANSION_DOORWAY_WHITE;
+		case STUDY:
+			return PathConfig.MANSION_DOORWAY_RED;
+		case TOILET:
+			return PathConfig.MANSION_DOORWAY_RED;
+		default:
+			return PathConfig.MANSION_DOORWAY_WHITE;
 		}
 	}
 
@@ -63,8 +106,8 @@ public class MapGenerator
 	{
 		Light a = new Light();
 		a.setWorldPos(new float[] { fp.width() / 2.0f, 2, fp.height() / 2.0f });
-		a.setSize(new float[] { fp.width() + 2, 6, fp.height() + 2});
-		a.setSize(new float[] { fp.width() + 2, 6, fp.height() + 2});
+		a.setSize(new float[] { fp.width() + 2, 6, fp.height() + 2 });
+		a.setSize(new float[] { fp.width() + 2, 6, fp.height() + 2 });
 		return a;
 	}
 
