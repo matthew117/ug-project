@@ -23,7 +23,6 @@ public class Entity extends StaticObject
 	private boolean staticPhysics = true;
 	private boolean isAffectedByDecal = false;
 	private String callbackFunc;
-	@SuppressWarnings("unused")
 	private List<Entity> connectedProps;
 	private String connectionStateChangedCallback;
 	private boolean fullGameSave = false;
@@ -163,6 +162,116 @@ public class Entity extends StaticObject
 		}
 		System.out.println("Redirecting to mesh file: " + s);
 		return s;
+	}
+
+	public boolean isActive()
+	{
+		return active;
+	}
+
+	public void setActive(boolean active)
+	{
+		this.active = active;
+	}
+
+	public boolean isStaticPhysics()
+	{
+		return staticPhysics;
+	}
+
+	public void setStaticPhysics(boolean staticPhysics)
+	{
+		this.staticPhysics = staticPhysics;
+	}
+
+	public boolean isAffectedByDecal()
+	{
+		return isAffectedByDecal;
+	}
+
+	public void setAffectedByDecal(boolean isAffectedByDecal)
+	{
+		this.isAffectedByDecal = isAffectedByDecal;
+	}
+
+	public String getCallbackFunc()
+	{
+		return callbackFunc;
+	}
+
+	public void setCallbackFunc(String callbackFunc)
+	{
+		this.callbackFunc = callbackFunc;
+	}
+
+	public List<Entity> getConnectedProps()
+	{
+		return connectedProps;
+	}
+
+	public void setConnectedProps(List<Entity> connectedProps)
+	{
+		this.connectedProps = connectedProps;
+	}
+
+	public String getConnectionStateChangedCallback()
+	{
+		return connectionStateChangedCallback;
+	}
+
+	public void setConnectionStateChangedCallback(String connectionStateChangedCallback)
+	{
+		this.connectionStateChangedCallback = connectionStateChangedCallback;
+	}
+
+	public boolean isFullGameSave()
+	{
+		return fullGameSave;
+	}
+
+	public void setFullGameSave(boolean fullGameSave)
+	{
+		this.fullGameSave = fullGameSave;
+	}
+
+	public String getPlayerLookAtCallback()
+	{
+		return playerLookAtCallback;
+	}
+
+	public void setPlayerLookAtCallback(String playerLookAtCallback)
+	{
+		this.playerLookAtCallback = playerLookAtCallback;
+	}
+
+	public boolean isPlayerLookAtCallbackAutoRemove()
+	{
+		return playerLookAtCallbackAutoRemove;
+	}
+
+	public void setPlayerLookAtCallbackAutoRemove(boolean playerLookAtCallbackAutoRemove)
+	{
+		this.playerLookAtCallbackAutoRemove = playerLookAtCallbackAutoRemove;
+	}
+
+	public String getPlayerInteractCallback()
+	{
+		return playerInteractCallback;
+	}
+
+	public void setPlayerInteractCallback(String playerInteractCallback)
+	{
+		this.playerInteractCallback = playerInteractCallback;
+	}
+
+	public boolean isPlayerInteractCallbackAutoRemove()
+	{
+		return playerInteractCallbackAutoRemove;
+	}
+
+	public void setPlayerInteractCallbackAutoRemove(boolean playerInteractCallbackAutoRemove)
+	{
+		this.playerInteractCallbackAutoRemove = playerInteractCallbackAutoRemove;
 	}
 
 	public String toString()

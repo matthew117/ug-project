@@ -33,7 +33,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig;
@@ -44,6 +46,7 @@ import uk.ac.dur.matthew.bates.ugproject.model.Node;
 import uk.ac.dur.matthew.bates.ugproject.model.Point;
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
 import uk.ac.dur.matthew.bates.ugproject.model.Room;
+import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
 import uk.ac.dur.matthew.bates.ugproject.model.WallConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.Welder;
@@ -57,8 +60,8 @@ public class UIWindow extends JFrame
 
 	private FloorPlan floorPlan;
 
-	private int uFloorPlanWidth = 48;
-	private int uFloorPlanHeight = 36;
+	private int uFloorPlanWidth = 28;
+	private int uFloorPlanHeight = 20;
 	private List<Double> uDefinedRoomAreas;
 	private boolean uShowMinorGridlines = true;
 	private boolean uShowMajorGridlines = true;
@@ -110,7 +113,7 @@ public class UIWindow extends JFrame
 		optPanel.setLayout(new BoxLayout(optPanel, BoxLayout.Y_AXIS));
 
 		optPanel.add(new JLabel("FloorPlan Width"));
-		txtFloorPlanWidth = new JTextField("48", 5);
+		txtFloorPlanWidth = new JTextField("" + uFloorPlanWidth, 5);
 		txtFloorPlanWidth.setMaximumSize(new Dimension(txtFloorPlanWidth.getPreferredSize().width, txtFloorPlanWidth
 				.getPreferredSize().height));
 		txtFloorPlanWidth.addActionListener(new ActionListener()
@@ -124,7 +127,7 @@ public class UIWindow extends JFrame
 		optPanel.add(txtFloorPlanWidth);
 
 		optPanel.add(new JLabel("FloorPlan Height"));
-		txtFloorPlanHeight = new JTextField("36", 5);
+		txtFloorPlanHeight = new JTextField("" + uFloorPlanHeight, 5);
 		txtFloorPlanHeight.setMaximumSize(new Dimension(txtFloorPlanHeight.getPreferredSize().width, txtFloorPlanHeight
 				.getPreferredSize().height));
 		txtFloorPlanHeight.addActionListener(new ActionListener()
@@ -334,7 +337,7 @@ public class UIWindow extends JFrame
 		for (int i = 1; i <= 9; i++)
 		{
 			if (i > 6) roomAreas.add((double) (r.nextInt(2) + 3));
-			else roomAreas.add((double) (r.nextInt(3) + 4));
+			else roomAreas.add((double) (r.nextInt(3) + 3));
 		}
 		Collections.shuffle(roomAreas);
 		return new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) roomAreas);
@@ -351,7 +354,8 @@ public class UIWindow extends JFrame
 			uDefinedRoomAreas.add(Double.parseDouble(s));
 		}
 
-		floorPlan = new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) uDefinedRoomAreas);
+		floorPlan = new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) uDefinedRoomAreas,
+				floorPlan.roomTypes());
 		mSelectedRoom = null;
 		fpViewer.repaint();
 	}
@@ -372,6 +376,11 @@ public class UIWindow extends JFrame
 				@Override
 				public void mousePressed(MouseEvent e)
 				{
+					if (e.isPopupTrigger())
+					{
+						SelectRoomTypePopUp menu = new SelectRoomTypePopUp();
+						menu.show(e.getComponent(), e.getX(), e.getY());
+					}
 					int floorplanWidth = floorPlan.width();
 					int floorplanHeight = floorPlan.height();
 
@@ -747,7 +756,8 @@ public class UIWindow extends JFrame
 						{
 							semiCircle = new Arc2D.Double(pm.x * scale - (int) (1.75 * scaleFactor), pm.y * scale
 									- (int) (1.75 * scaleFactor) + 1.25 * scale, 5.5 * scale, 5.5 * scale,
-									90 - w.flippedOrientation(), Math.abs(90 - (w.flippedOrientation() - 90)), Arc2D.PIE);
+									90 - w.flippedOrientation(), Math.abs(90 - (w.flippedOrientation() - 90)),
+									Arc2D.PIE);
 							g.setColor(Color.BLACK);
 							g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
 							if (w.orientation() == Wall.EAST)
@@ -862,7 +872,31 @@ public class UIWindow extends JFrame
 					g.setStroke(new BasicStroke(1));
 				}
 			}
+		}
 
+		class SelectRoomTypePopUp extends JPopupMenu
+		{
+			public SelectRoomTypePopUp()
+			{
+				for (final RoomType t : RoomType.values())
+				{
+					JMenuItem option = new JMenuItem(t.toString());
+					option.addActionListener(new ActionListener()
+					{
+						@Override
+						public void actionPerformed(ActionEvent e)
+						{
+							int roomID = floorPlan.getIDByRoomBound(mSelectedRoom);
+							if (roomID != -1)
+							{
+								floorPlan = floorPlan.changeRoomType(floorPlan.getIDByRoomBound(mSelectedRoom), t);
+								fpViewer.repaint();
+							}
+						}
+					});
+					add(option);
+				}
+			}
 		}
 
 	}

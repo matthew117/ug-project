@@ -23,14 +23,14 @@ public class Test_DataFrame
 	public void testLoadFromFile()
 	{
 		assertNotNull("TestFrame is null.", tf);
-		assertEquals(12, tf.size());
+		assertEquals(14, tf.size());
 		System.out.println(tf.toString());
 	}
 	
 	@Test
 	public void testSize()
 	{
-		assertEquals(12, tf.size());
+		assertEquals(14, tf.size());
 	}
 
 	@Test
@@ -43,51 +43,51 @@ public class Test_DataFrame
 	@Test
 	public void testGetString()
 	{
-		assertEquals("x", tf.get("Living", "Kitchen"));
+		assertEquals("x", tf.get("Living Room", "Kitchen"));
 	}
 
 	@Test
 	public void testColumnLabels()
 	{
-		List<String> labels = Arrays.asList("Outside", "Kitchen", "Pantry", "Laundry", "Living",
-				"Dining", "Toilet", "Bedroom", "Master", "Bathroom", "Secondary");
+		List<String> labels = Arrays.asList("Outside", "Kitchen", "Storage", "Laundry", "Living Room",
+				"Dining Room", "Toilet", "Bedroom", "Master Bedroom", "Bathroom", "Guest Room", "Study", "Foyer");
 		assertEquals(labels, tf.columnLabels());
 	}
 
 	@Test
 	public void testRowLabels()
 	{
-		List<String> labels = Arrays.asList("Outside", "Kitchen", "Pantry", "Laundry", "Living",
-				"Dining", "Toilet", "Bedroom", "Master", "Bathroom", "Secondary");
+		List<String> labels = Arrays.asList("Outside", "Kitchen", "Storage", "Laundry", "Living Room",
+				"Dining Room", "Toilet", "Bedroom", "Master Bedroom", "Bathroom", "Guest Room", "Study", "Foyer");
 		assertEquals(labels, tf.columnLabels());
 	}
 
 	@Test
 	public void testColumnInt()
 	{
-		assertEquals(Arrays.asList("","x","","","x","","","","","",""), tf.column(0));
-		assertEquals(Arrays.asList("x","","x","x","x","x","","","","",""), tf.column(1));
+		assertEquals(Arrays.asList("","x","","","x","","","","","","","","x"), tf.column(0));
+		assertEquals(Arrays.asList("x","","x","x","x","x","","","","","","","x"), tf.column(1));
 	}
 
 	@Test
 	public void testColumnString()
 	{
-		assertEquals(Arrays.asList("","x","","","x","","","","","",""), tf.column("Outside"));
-		assertEquals(Arrays.asList("x","","x","x","x","x","","","","",""), tf.column("Kitchen"));
+		assertEquals(Arrays.asList("","x","","","x","","","","","","","","x"), tf.column("Outside"));
+		assertEquals(Arrays.asList("x","","x","x","x","x","","","","","","","x"), tf.column("Kitchen"));
 	}
 
 	@Test
 	public void testRowInt()
 	{
-		assertEquals(Arrays.asList("","x","","","x","","","","",""), tf.row(0));
-		assertEquals(Arrays.asList("x","","x","x","x","x","","","",""), tf.row(1));
+		assertEquals(Arrays.asList("","x","","","x","","","","","","",""), tf.row(0));
+		assertEquals(Arrays.asList("x","","x","x","x","x","","","","","",""), tf.row(1));
 	}
 
 	@Test
 	public void testRowString()
 	{
-		assertEquals(Arrays.asList("","x","","","x","","","","",""), tf.row("Outside"));
-		assertEquals(Arrays.asList("x","","x","x","x","x","","","",""), tf.row("Kitchen"));
+		assertEquals(Arrays.asList("","x","","","x","","","","","","",""), tf.row("Outside"));
+		assertEquals(Arrays.asList("x","","x","x","x","x","","","","","",""), tf.row("Kitchen"));
 	}
 
 }

@@ -10,6 +10,9 @@ public class DoorConnection extends WallConnection
 	{
 		super(frontFacing, backFacing);
 		this.doorPlacement = doorPlacement;
+		Line o = Line.overlap(frontFacing, backFacing);
+		leftWallSegment = new Line(o.p, doorPlacement.p);
+		rightWallSegment = new Line(doorPlacement.q, o.q);
 	}
 	
 	public Line doorPlacement()
@@ -19,11 +22,13 @@ public class DoorConnection extends WallConnection
 	
 	public Line leftWallSegment()
 	{
+		if (leftWallSegment != null) return leftWallSegment;
 		return leftWallSegment;
 	}
 	
 	public Line rightWallSegment()
 	{
+		if (rightWallSegment != null) return rightWallSegment;
 		return rightWallSegment;
 	}
 	

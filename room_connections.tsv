@@ -1,12 +1,14 @@
-	Outside	Kitchen	Pantry	Laundry	Living	Dining	Toilet	Bedroom	Master	Bathroom	Secondary
-Outside		x			x						
-Kitchen	x		x	x	x	x					
-Pantry		x		x							
-Laundry		x	x								
-Living	x	x				x	x	x	x	x	x
-Dining		x			x		x	x	x	x	x
-Toilet					x	x					
-Bedroom					x	x				x	
-Master					x	x				x	
-Bathroom					x	x		x	x		x
-Secondary					x	x				x	
+	Outside	Kitchen	Storage	Laundry	Living Room	Dining Room	Toilet	Bedroom	Master Bedroom	Bathroom	Guest Room	Study	Foyer
+Outside		x			x								x
+Kitchen	x		x	x	x	x							x
+Storage		x		x		x						x	
+Laundry		x	x										
+Living Room	x	x				x	x	x	x	x	x	x	x
+Dining Room		x	x		x		x	x	x	x	x	x	x
+Toilet					x	x							x
+Bedroom					x	x				x		x	
+Master Bedroom					x	x				x		x	x
+Bathroom					x	x		x	x		x	x	
+Guest Room					x	x				x		x	x
+Study					x			x	x		x		x
+Foyer	x	x			x	x	x			x	x	x	

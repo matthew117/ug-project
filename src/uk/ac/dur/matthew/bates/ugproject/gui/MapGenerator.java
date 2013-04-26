@@ -14,9 +14,12 @@ import uk.ac.dur.matthew.bates.ugproject.model.FloorPlan;
 import uk.ac.dur.matthew.bates.ugproject.model.Room;
 import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
+import uk.ac.dur.matthew.bates.ugproject.util.RandomUtils;
 
 public class MapGenerator
 {
+	private static final float WALL_PADDING = 0.005f;
+
 	private FloorPlan fp;
 	private HPL2Map map;
 
@@ -45,13 +48,19 @@ public class MapGenerator
 			int back = d.backFacing().orientation();
 
 			StaticObject a = new StaticObject(getDoorWayModelByType(d.frontFacing().parent().type()));
-			a.setWorldPos(new float[] { x, 0, y });
-			a.setRotation(new float[] { 0, back, 0 });
+			if (d.frontFacing().orientation() == Wall.NORTH) a.setWorldPos(new float[] { x, 0, y - WALL_PADDING });
+			if (d.frontFacing().orientation() == Wall.SOUTH) a.setWorldPos(new float[] { x, 0, y + WALL_PADDING });
+			if (d.frontFacing().orientation() == Wall.EAST) a.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
+			if (d.frontFacing().orientation() == Wall.WEST) a.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			a.setRotation(new float[] { 0, front, 0 });
 			this.map.getMapData().addStaticObject(a);
 
 			StaticObject b = new StaticObject(getDoorWayModelByType(d.backFacing().parent().type()));
-			b.setWorldPos(new float[] { x, 0, y });
-			b.setRotation(new float[] { 0, front, 0 });
+			if (d.backFacing().orientation() == Wall.NORTH) b.setWorldPos(new float[] { x, 0, y - WALL_PADDING });
+			if (d.backFacing().orientation() == Wall.SOUTH) b.setWorldPos(new float[] { x, 0, y + WALL_PADDING });
+			if (d.backFacing().orientation() == Wall.EAST) b.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
+			if (d.backFacing().orientation() == Wall.WEST) b.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			b.setRotation(new float[] { 0, back, 0 });
 			this.map.getMapData().addStaticObject(b);
 
 			StaticObject f = new StaticObject(PathConfig.MANSION_DOOR_FRAME);
@@ -63,6 +72,7 @@ public class MapGenerator
 			c.setWorldPos(new float[] { x, 0, y });
 			c.setRotation(new float[] { 0, back, 0 });
 			c.setCollides(true);
+			c.setStaticPhysics(false);
 			this.map.getMapData().addEntity(c);
 		}
 	}
@@ -88,9 +98,7 @@ public class MapGenerator
 		case LIVING_ROOM:
 			return PathConfig.MANSION_DOORWAY_WHITE;
 		case MASTER_BEDROOM:
-			return PathConfig.MANSION_DOORWAY_WHITE;
-		case PANTRY:
-			return PathConfig.MANSION_DOORWAY_WHITE;
+			return PathConfig.MANSION_DOORWAY_RED;
 		case STORAGE:
 			return PathConfig.MANSION_DOORWAY_WHITE;
 		case STUDY:
@@ -134,10 +142,11 @@ public class MapGenerator
 
 	private void generateWalls()
 	{
-		float WALL_PADDING = 0.005f;
 		for (Wall t : fp.tessellation())
 		{
-			StaticObject o = new StaticObject(getWallModel(t));
+			StaticObject o = new StaticObject(
+					RandomUtils.getRandomBoolean() ? (fp.couldBeWindow(t) ? PathConfig.WINDOW_LARGE_BLUE
+							: getWallModel(t)) : getWallModel(t));
 			if (t.orientation() == Wall.NORTH)
 				o.setWorldPos(new float[] { t.midpoint().x, 0, t.midpoint().y - WALL_PADDING });
 			if (t.orientation() == Wall.SOUTH)
@@ -173,8 +182,6 @@ public class MapGenerator
 			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_WHITE : PathConfig.MANSION_WALL_WHITE;
 		case MASTER_BEDROOM:
 			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_RED : PathConfig.MANSION_WALL_RED;
-		case PANTRY:
-			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_WHITE : PathConfig.MANSION_WALL_WHITE;
 		case STORAGE:
 			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_WHITE : PathConfig.MANSION_WALL_WHITE;
 		case STUDY:
@@ -200,7 +207,6 @@ public class MapGenerator
 		case LAUNDRY: return PathConfig.MANSION_FLOORBOARDS_MATERIAL;
 		case LIVING_ROOM: return PathConfig.MANSION_FLOORBOARDS_MATERIAL;
 		case MASTER_BEDROOM: return PathConfig.MANSION_FLOOR_MATERIAL;
-		case PANTRY: return PathConfig.MANSION_FLOORBOARDS_MATERIAL;
 		case STORAGE: return PathConfig.MANSION_FLOORBOARDS_MATERIAL;
 		case STUDY: return PathConfig.MANSION_FLOOR_MATERIAL;
 		case TOILET: return PathConfig.TILED_FLOOR_MATERIAL;

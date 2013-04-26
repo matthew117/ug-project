@@ -7,7 +7,7 @@ public class Room extends Rect
 
 	public enum RoomType
 	{
-		FOYER, KITCHEN, PANTRY, LAUNDRY, LIVING_ROOM, DINING_ROOM, TOILET, BEDROOM, MASTER_BEDROOM, BATHROOM, GUEST_ROOM, STUDY, STORAGE;
+		FOYER, KITCHEN, LAUNDRY, LIVING_ROOM, DINING_ROOM, TOILET, BEDROOM, MASTER_BEDROOM, BATHROOM, GUEST_ROOM, STUDY, STORAGE;
 
 		public String toString()
 		{
@@ -17,8 +17,6 @@ public class Room extends Rect
 				return "Foyer";
 			case KITCHEN:
 				return "Kitchen";
-			case PANTRY:
-				return "Pantry";
 			case LAUNDRY:
 				return "Laundry";
 			case LIVING_ROOM:
@@ -60,6 +58,17 @@ public class Room extends Rect
 	public RoomType type()
 	{
 		return type;
+	}
+	
+	public void type(RoomType t)
+	{
+		this.type = t;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return type.toString();
 	}
 
 }

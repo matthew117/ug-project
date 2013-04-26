@@ -5,7 +5,6 @@ public class Door extends Entity
 	public Door(String filePath)
 	{
 		super(filePath);
-		// TODO Auto-generated constructor stub
 	}
 
 	private boolean locked = false;

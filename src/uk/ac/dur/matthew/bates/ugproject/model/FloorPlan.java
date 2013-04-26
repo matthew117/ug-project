@@ -20,6 +20,11 @@ public class FloorPlan
 	private List<Room> mRooms;
 	private List<Wall> mTessellation;
 	private Node mNodeRoot;
+	private List<Room.RoomType> mRoomTypes;
+
+	public FloorPlan()
+	{
+	}
 
 	public FloorPlan(int width, int height, ArrayList<Double> areas)
 	{
@@ -32,6 +37,32 @@ public class FloorPlan
 		mRoomBounds = roomBounds;
 	}
 
+	public FloorPlan(FloorPlan org, List<RoomType> roomTypes)
+	{
+		List<Double> a = new ArrayList<Double>();
+		for (int i : org.areas())
+			a.add((double) i);
+		this.mAreas = a;
+		this.mRoomBounds = new ArrayList<Rect>(org.roomBounds());
+
+		List<Room> rooms = new ArrayList<Room>();
+		List<Rect> roomBounds = roomBounds();
+		for (int i = 0; i < roomBounds.size(); i++)
+		{
+			Rect r = roomBounds.get(i);
+			rooms.add(new Room(r, i, roomTypes.get(i)));
+		}
+
+		this.mRooms = rooms;
+	}
+
+	public FloorPlan(int width, int height, ArrayList<Double> areas, List<RoomType> roomTypes)
+	{
+		mAreas = new ArrayList<Double>(areas);
+		mRoomBounds = Squarify.squarify(areas, new RectF(0, 0, width, height));
+		mRoomTypes = roomTypes;
+	}
+
 	public List<Rect> roomBounds()
 	{
 		return new ArrayList<Rect>(mRoomBounds);
@@ -40,8 +71,24 @@ public class FloorPlan
 	public List<Room> rooms()
 	{
 		if (mRooms != null) return mRooms;
+		if (mRoomTypes != null)
+		{
+			List<Room> rooms = new ArrayList<Room>();
+			List<Rect> roomBounds = roomBounds();
+			for (int i = 0; i < roomBounds.size(); i++)
+			{
+				Rect r = roomBounds.get(i);
+				rooms.add(new Room(r, i, mRoomTypes.get(i)));
+			}
+			return rooms;
+		}
 		RoomAllocationRule rule = new RandomStackRoomAllocation();
 		mRooms = rule.allocateRooms(this);
+		mRoomTypes = new ArrayList<Room.RoomType>();
+		for (Room r : mRooms)
+		{
+			mRoomTypes.add(r.type());
+		}
 		return mRooms;
 	}
 
@@ -75,11 +122,6 @@ public class FloorPlan
 		List<Welder> welders = new ArrayList<Welder>();
 		for (Room r : rooms())
 		{
-			if (r.type() == RoomType.BATHROOM) continue;
-			if (r.type() == RoomType.STORAGE) continue;
-			if (r.type() == RoomType.PANTRY) continue;
-			if (r.type() == RoomType.TOILET) continue;
-
 			Point tl = new Point(r.x, r.y);
 			Point tr = new Point(r.x + r.width, r.y);
 			Point bl = new Point(r.x, r.y + r.height);
@@ -112,7 +154,7 @@ public class FloorPlan
 	{
 		if (mWallConnections != null) return new ArrayList<WallConnection>(mWallConnections);
 		List<WallConnection> connections = new ArrayList<WallConnection>();
-		DoorPlacingRule placementRule = new SimpleDoorPlacementRule();
+		DoorPlacingRule placementRule = new ConnectStatsDoorPlacementRule();
 		for (int i = 0; i < walls().size(); i++)
 		{
 			for (int j = i + 1; j < walls().size(); j++)
@@ -127,6 +169,46 @@ public class FloorPlan
 		return connections;
 	}
 
+	public int smallestRoomHeight()
+	{
+		int min = roomBounds().get(0).height;
+		for (Rect r : roomBounds())
+		{
+			if (r.height < min) min = r.height;
+		}
+		return min;
+	}
+
+	public int smallestRoomWidth()
+	{
+		int min = roomBounds().get(0).width;
+		for (Rect r : roomBounds())
+		{
+			if (r.width < min) min = r.width;
+		}
+		return min;
+	}
+
+	public Rect leftExternalBound()
+	{
+		return new Rect(0, 0, smallestRoomWidth() - 1, height());
+	}
+
+	public Rect rightExternalBound()
+	{
+		return new Rect(width() - (smallestRoomWidth() - 1), 0, (smallestRoomWidth() - 1), height());
+	}
+
+	public Rect topExternalBound()
+	{
+		return new Rect(0, 0, width(), smallestRoomHeight() - 1);
+	}
+
+	public Rect bottomExternalBound()
+	{
+		return new Rect(0, height() - (smallestRoomHeight() - 1), width(), (smallestRoomHeight() - 1));
+	}
+
 	public boolean isExternalWall(Wall w)
 	{
 		return !isInternalWall(w);
@@ -139,6 +221,21 @@ public class FloorPlan
 			if (c.frontFacing().equals(w) || c.backFacing().equals(w)) return true;
 		}
 		return false;
+	}
+	
+	public boolean couldBeWindow(Wall q)
+	{
+		if (q.length() != 4) return false;
+		
+		for (WallConnection c : wallConnections())
+		{
+			Line a = Line.overlap(c.frontFacing(), q);
+			Line b = Line.overlap(c.backFacing(), q);
+			if (a == null || b == null) continue;
+			if (a.length() > 1 || b.length() > 1) return false;
+		}
+		
+		return true;
 	}
 
 	public boolean isDoorWall(Wall w)
@@ -163,6 +260,33 @@ public class FloorPlan
 		return dcs;
 	}
 
+	public List<RoomType> roomTypes()
+	{
+		List<RoomType> roomTypeList = new ArrayList<Room.RoomType>();
+		for (Room r : rooms())
+		{
+			roomTypeList.add(r.type());
+		}
+		return roomTypeList;
+	}
+
+	public FloorPlan changeRoomType(int roomID, RoomType type)
+	{
+		List<RoomType> roomTypes = roomTypes();
+		roomTypes.set(roomID, type);
+		return new FloorPlan(this, roomTypes);
+	}
+
+	public List<DoorConnection> relatedDoorConnections(Wall w)
+	{
+		List<DoorConnection> xs = new ArrayList<DoorConnection>();
+		for (DoorConnection dc : doorConnections())
+		{
+			if (dc.frontFacing().equals(w) || dc.backFacing().equals(w)) xs.add(dc);
+		}
+		return xs;
+	}
+
 	public List<Wall> tessellation()
 	{
 		if (mTessellation != null) return mTessellation;
@@ -171,71 +295,303 @@ public class FloorPlan
 		{
 			Line left = r.left();
 			int leftLen = (int) left.length();
-			for (int i = 0; i < leftLen;)
+			List<DoorConnection> xs = relatedDoorConnections(new Wall(left, r, Wall.WEST));
+			if (!xs.isEmpty())
 			{
-				if (leftLen - i >= 4)
+				for (DoorConnection dc : xs)
 				{
-					tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 4), r,
-							Wall.WEST));
-					i += 4;
+					Line a = dc.leftWallSegment();
+					Line b = dc.rightWallSegment();
+					int aLenth = (int) a.length();
+					int bLength = (int) b.length();
+
+					for (int i = 0; i < aLenth;)
+					{
+						if (aLenth - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r, Wall.WEST));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r, Wall.WEST));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; i < bLength;)
+					{
+						if (bLength - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.WEST));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.WEST));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; b.q.y + i < left.q.y;)
+					{
+						System.out.println("odguidg");
+						if (left.q.y - (b.q.y + i) >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.WEST));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.WEST));
+							i += 2;
+						}
+					}
 				}
-				else
+			}
+			else
+			{
+				for (int i = 0; i < leftLen;)
 				{
-					tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 2), r,
-							Wall.WEST));
-					i += 2;
+					if (leftLen - i >= 4)
+					{
+						tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 4), r,
+								Wall.WEST));
+						i += 4;
+					}
+					else
+					{
+						tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 2), r,
+								Wall.WEST));
+						i += 2;
+					}
 				}
 			}
 
 			Line right = r.right();
 			int rightLen = (int) right.length();
-			for (int i = 0; i < rightLen;)
+			xs = relatedDoorConnections(new Wall(right, r, Wall.EAST));
+			if (!xs.isEmpty())
 			{
-				if (rightLen - i >= 4)
+				for (DoorConnection dc : xs)
 				{
-					tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 4), r,
-							Wall.EAST));
-					i += 4;
+					Line a = dc.leftWallSegment();
+					Line b = dc.rightWallSegment();
+					int aLenth = (int) a.length();
+					int bLength = (int) b.length();
+
+					for (int i = 0; i < aLenth;)
+					{
+						if (aLenth - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r, Wall.EAST));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r, Wall.EAST));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; i < bLength;)
+					{
+						if (bLength - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.EAST));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.EAST));
+							i += 2;
+						}
+					}
 				}
-				else
+
+				// TODO just do it normally but if next tessellation is door..
+
+				// for (int i = 0; b.q.y + i < right.q.y;)
+				// {
+				// System.out.println("odguidg");
+				// if (right.q.y - (b.q.y + i) >= 4)
+				// {
+				// tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
+				// Wall.EAST));
+				// i += 4;
+				// }
+				// else
+				// {
+				// tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
+				// Wall.EAST));
+				// i += 2;
+				// }
+				// }
+			}
+			else
+			{
+				for (int i = 0; i < rightLen;)
 				{
-					tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 2), r,
-							Wall.EAST));
-					i += 2;
+					if (rightLen - i >= 4)
+					{
+						tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 4), r,
+								Wall.EAST));
+						i += 4;
+					}
+					else
+					{
+						tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 2), r,
+								Wall.EAST));
+						i += 2;
+					}
 				}
 			}
 
 			Line top = r.top();
 			int topLen = (int) top.length();
-			for (int i = 0; i < topLen;)
+			xs = relatedDoorConnections(new Wall(top, r, Wall.SOUTH));
+			if (!xs.isEmpty())
 			{
-				if (topLen - i >= 4)
+				for (DoorConnection dc : xs)
 				{
-					tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 4, top.q.y), r, Wall.SOUTH));
-					i += 4;
+					Line a = dc.leftWallSegment();
+					Line b = dc.rightWallSegment();
+					int aLenth = (int) a.length();
+					int bLength = (int) b.length();
+
+					for (int i = 0; i < aLenth;)
+					{
+						if (aLenth - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r, Wall.SOUTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r, Wall.SOUTH));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; i < bLength;)
+					{
+						if (bLength - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.SOUTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.SOUTH));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; b.q.x + i < top.q.x;)
+					{
+						if (top.q.x - (b.q.x + i) >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.SOUTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.SOUTH));
+							i += 2;
+						}
+					}
 				}
-				else
+			}
+			else
+			{
+				for (int i = 0; i < topLen;)
 				{
-					tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 2, top.q.y), r, Wall.SOUTH));
-					i += 2;
+					if (topLen - i >= 4)
+					{
+						tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 4, top.q.y), r,
+								Wall.SOUTH));
+						i += 4;
+					}
+					else
+					{
+						tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 2, top.q.y), r,
+								Wall.SOUTH));
+						i += 2;
+					}
 				}
 			}
 
 			Line bottom = r.bottom();
 			int bottomLen = (int) bottom.length();
-			for (int i = 0; i < bottomLen;)
+			xs = relatedDoorConnections(new Wall(bottom, r, Wall.NORTH));
+			if (!xs.isEmpty())
 			{
-				if (bottomLen - i >= 4)
+				for (DoorConnection dc : xs)
 				{
-					tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 4, bottom.q.y), r,
-							Wall.NORTH));
-					i += 4;
+					Line a = dc.leftWallSegment();
+					Line b = dc.rightWallSegment();
+					int aLenth = (int) a.length();
+					int bLength = (int) b.length();
+
+					for (int i = 0; i < aLenth;)
+					{
+						if (aLenth - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r, Wall.NORTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r, Wall.NORTH));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; i < bLength;)
+					{
+						if (bLength - i >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.NORTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.NORTH));
+							i += 2;
+						}
+					}
+
+					for (int i = 0; b.q.x + i < bottom.q.x;)
+					{
+						if (bottom.q.x - (b.q.x + i) >= 4)
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.NORTH));
+							i += 4;
+						}
+						else
+						{
+							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.NORTH));
+							i += 2;
+						}
+					}
 				}
-				else
+			}
+			else
+			{
+				for (int i = 0; i < bottomLen;)
 				{
-					tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 2, bottom.q.y), r,
-							Wall.NORTH));
-					i += 2;
+					if (bottomLen - i >= 4)
+					{
+						tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 4, bottom.q.y),
+								r, Wall.NORTH));
+						i += 4;
+					}
+					else
+					{
+						tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 2, bottom.q.y),
+								r, Wall.NORTH));
+						i += 2;
+					}
 				}
 			}
 		}
@@ -334,7 +690,8 @@ public class FloorPlan
 
 	public FloorPlan normalizeRoomSizes()
 	{
-		FloorPlan nFP = new FloorPlan(this.width(), this.height(), new ArrayList<Double>(mAreas));
+		FloorPlan nFP = new FloorPlan(this.width(), this.height(), new ArrayList<Double>(mAreas),
+				new ArrayList<RoomType>(mRoomTypes));
 		for (int i = 0; i < nFP.roomBounds().size(); i++)
 		{
 			Rect r = nFP.roomBounds().get(i);
