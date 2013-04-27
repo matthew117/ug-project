@@ -20,7 +20,7 @@ public class FloorPlan
 	private List<Wall> mWalls;
 	private List<WallConnection> mWallConnections;
 	private List<Room> mRooms;
-	private List<Wall> mTessellation;
+	private List<Tessellation> mTessellation;
 	private Node mNodeRoot;
 	private List<Room.RoomType> mRoomTypes;
 
@@ -270,10 +270,10 @@ public class FloorPlan
 		return xs;
 	}
 
-	public List<Wall> tessellation()
+	public List<Tessellation> tessellation()
 	{
 		if (mTessellation != null) return mTessellation;
-		List<Wall> tessellation = new ArrayList<Wall>();
+		List<Tessellation> tessellation = new ArrayList<Tessellation>();
 		for (Room r : rooms())
 		{
 			Line left = r.left();
@@ -292,12 +292,14 @@ public class FloorPlan
 					{
 						if (aLenth - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r,
+									Wall.WEST));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r,
+									Wall.WEST));
 							i += 2;
 						}
 					}
@@ -306,12 +308,14 @@ public class FloorPlan
 					{
 						if (bLength - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
+									Wall.WEST));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
+									Wall.WEST));
 							i += 2;
 						}
 					}
@@ -320,12 +324,14 @@ public class FloorPlan
 					{
 						if (left.q.y - (b.q.y + i) >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
+									Wall.WEST));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.WEST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
+									Wall.WEST));
 							i += 2;
 						}
 					}
@@ -337,14 +343,14 @@ public class FloorPlan
 				{
 					if (leftLen - i >= 4)
 					{
-						tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 4), r,
-								Wall.WEST));
+						tessellation.add(new Tessellation(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 4),
+								r, Wall.WEST));
 						i += 4;
 					}
 					else
 					{
-						tessellation.add(new Wall(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 2), r,
-								Wall.WEST));
+						tessellation.add(new Tessellation(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 2),
+								r, Wall.WEST));
 						i += 2;
 					}
 				}
@@ -366,12 +372,14 @@ public class FloorPlan
 					{
 						if (aLenth - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r, Wall.EAST));
+							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r,
+									Wall.EAST));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r, Wall.EAST));
+							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r,
+									Wall.EAST));
 							i += 2;
 						}
 					}
@@ -380,12 +388,14 @@ public class FloorPlan
 					{
 						if (bLength - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.EAST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
+									Wall.EAST));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r, Wall.EAST));
+							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
+									Wall.EAST));
 							i += 2;
 						}
 					}
@@ -416,14 +426,14 @@ public class FloorPlan
 				{
 					if (rightLen - i >= 4)
 					{
-						tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 4), r,
-								Wall.EAST));
+						tessellation.add(new Tessellation(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i
+								+ 4), r, Wall.EAST));
 						i += 4;
 					}
 					else
 					{
-						tessellation.add(new Wall(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i + 2), r,
-								Wall.EAST));
+						tessellation.add(new Tessellation(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i
+								+ 2), r, Wall.EAST));
 						i += 2;
 					}
 				}
@@ -445,12 +455,14 @@ public class FloorPlan
 					{
 						if (aLenth - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r,
+									Wall.SOUTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r,
+									Wall.SOUTH));
 							i += 2;
 						}
 					}
@@ -459,12 +471,14 @@ public class FloorPlan
 					{
 						if (bLength - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
+									Wall.SOUTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
+									Wall.SOUTH));
 							i += 2;
 						}
 					}
@@ -473,12 +487,14 @@ public class FloorPlan
 					{
 						if (top.q.x - (b.q.x + i) >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
+									Wall.SOUTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.SOUTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
+									Wall.SOUTH));
 							i += 2;
 						}
 					}
@@ -490,13 +506,13 @@ public class FloorPlan
 				{
 					if (topLen - i >= 4)
 					{
-						tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 4, top.q.y), r,
+						tessellation.add(new Tessellation(new Line(top.p.x + i, top.p.y, top.p.x + i + 4, top.q.y), r,
 								Wall.SOUTH));
 						i += 4;
 					}
 					else
 					{
-						tessellation.add(new Wall(new Line(top.p.x + i, top.p.y, top.p.x + i + 2, top.q.y), r,
+						tessellation.add(new Tessellation(new Line(top.p.x + i, top.p.y, top.p.x + i + 2, top.q.y), r,
 								Wall.SOUTH));
 						i += 2;
 					}
@@ -519,12 +535,14 @@ public class FloorPlan
 					{
 						if (aLenth - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r,
+									Wall.NORTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r,
+									Wall.NORTH));
 							i += 2;
 						}
 					}
@@ -533,12 +551,14 @@ public class FloorPlan
 					{
 						if (bLength - i >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
+									Wall.NORTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
+									Wall.NORTH));
 							i += 2;
 						}
 					}
@@ -547,12 +567,14 @@ public class FloorPlan
 					{
 						if (bottom.q.x - (b.q.x + i) >= 4)
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
+									Wall.NORTH));
 							i += 4;
 						}
 						else
 						{
-							tessellation.add(new Wall(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r, Wall.NORTH));
+							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
+									Wall.NORTH));
 							i += 2;
 						}
 					}
@@ -564,14 +586,14 @@ public class FloorPlan
 				{
 					if (bottomLen - i >= 4)
 					{
-						tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 4, bottom.q.y),
-								r, Wall.NORTH));
+						tessellation.add(new Tessellation(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 4,
+								bottom.q.y), r, Wall.NORTH));
 						i += 4;
 					}
 					else
 					{
-						tessellation.add(new Wall(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 2, bottom.q.y),
-								r, Wall.NORTH));
+						tessellation.add(new Tessellation(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 2,
+								bottom.q.y), r, Wall.NORTH));
 						i += 2;
 					}
 				}
