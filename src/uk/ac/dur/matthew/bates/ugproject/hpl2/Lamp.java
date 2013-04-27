@@ -5,7 +5,6 @@ public class Lamp extends Entity
 	public Lamp(String filePath)
 	{
 		super(filePath);
-		// TODO Auto-generated constructor stub
 	}
 
 	private boolean lit = true;

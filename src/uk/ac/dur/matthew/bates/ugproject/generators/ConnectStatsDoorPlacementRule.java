@@ -1,6 +1,9 @@
-package uk.ac.dur.matthew.bates.ugproject.model;
+package uk.ac.dur.matthew.bates.ugproject.generators;
 
 import uk.ac.dur.matthew.bates.ugproject.data.RoomConnectionStats;
+import uk.ac.dur.matthew.bates.ugproject.model.DoorPlacingRule;
+import uk.ac.dur.matthew.bates.ugproject.model.Line;
+import uk.ac.dur.matthew.bates.ugproject.model.Wall;
 
 public class ConnectStatsDoorPlacementRule implements DoorPlacingRule
 {
@@ -8,7 +11,7 @@ public class ConnectStatsDoorPlacementRule implements DoorPlacingRule
 	public boolean canPlaceDoor(Wall a, Wall b)
 	{
 		Line c = Line.overlap(a, b);
-		if (c != null && c.length() >= 6)
+		if (c != null && c.length() >= 4)
 		{
 			return RoomConnectionStats.canConnectTo(a.parent().type(), b.parent().type());
 		}

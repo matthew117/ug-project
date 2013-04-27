@@ -27,12 +27,42 @@ public class RoomConnectionStats
 		return xs;
 	}
 	
+	public static List<Room.RoomType> connectsToPublicOnly(RoomType t)
+	{
+		List<Room.RoomType> xs = new ArrayList<Room.RoomType>();
+		for (RoomType i : RoomType.values())
+		{
+			if (i.isPublic() && canConnectTo(t, i)) xs.add(i);
+		}
+		return xs;
+	}
+	
+	public static List<Room.RoomType> connectsToPublicOnly(RoomType t, Collection<RoomType> s)
+	{
+		List<Room.RoomType> xs = new ArrayList<Room.RoomType>();
+		for (RoomType i : RoomType.values())
+		{
+			if (!s.contains(i) && i.isPublic() && canConnectTo(t, i)) xs.add(i);
+		}
+		return xs;
+	}
+	
+	public static List<Room.RoomType> connectsToPrivateOnly(RoomType t)
+	{
+		List<Room.RoomType> xs = new ArrayList<Room.RoomType>();
+		for (RoomType i : RoomType.values())
+		{
+			if (i.isPrivate() && canConnectTo(t, i)) xs.add(i);
+		}
+		return xs;
+	}
+	
 	public static List<Room.RoomType> connectsTo(RoomType t, Collection<RoomType> s)
 	{
 		List<Room.RoomType> xs = new ArrayList<Room.RoomType>();
-		for (RoomType i : s)
+		for (RoomType i : RoomType.values())
 		{
-			if (canConnectTo(t, i)) xs.add(i);
+			if (!s.contains(i) && canConnectTo(t, i)) xs.add(i);
 		}
 		return xs;
 	}

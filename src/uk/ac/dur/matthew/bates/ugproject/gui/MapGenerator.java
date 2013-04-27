@@ -140,12 +140,14 @@ public class MapGenerator
 		}
 	}
 
+	
+	// TODO sort out window texture
 	private void generateWalls()
 	{
 		for (Wall t : fp.tessellation())
 		{
 			StaticObject o = new StaticObject(
-					RandomUtils.getRandomBoolean() ? (fp.couldBeWindow(t) ? PathConfig.WINDOW_LARGE_BLUE
+					RandomUtils.getRandomBoolean() ? (fp.couldBeWindow(t) ? getWindowModel(t)
 							: getWallModel(t)) : getWallModel(t));
 			if (t.orientation() == Wall.NORTH)
 				o.setWorldPos(new float[] { t.midpoint().x, 0, t.midpoint().y - WALL_PADDING });
@@ -190,6 +192,39 @@ public class MapGenerator
 			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_RED : PathConfig.MANSION_WALL_RED;
 		default:
 			return t.length() == 2 ? PathConfig.MANSION_HALFWALL_WHITE : PathConfig.MANSION_WALL_WHITE;
+		}
+	}
+	
+	protected String getWindowModel(Wall t)
+	{
+		switch (t.parent().type())
+		{
+		case BATHROOM:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case BEDROOM:
+			return t.length() == 2 ? PathConfig.WINDOW02_BLUE : PathConfig.WINDOW02_BLUE;
+		case DINING_ROOM:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case FOYER:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case GUEST_ROOM:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case KITCHEN:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case LAUNDRY:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case LIVING_ROOM:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case MASTER_BEDROOM:
+			return t.length() == 2 ? PathConfig.WINDOW02_BLUE : PathConfig.WINDOW02_BLUE;
+		case STORAGE:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
+		case STUDY:
+			return t.length() == 2 ? PathConfig.WINDOW02_BLUE : PathConfig.WINDOW02_BLUE;
+		case TOILET:
+			return t.length() == 2 ? PathConfig.WINDOW02_BLUE : PathConfig.WINDOW02_BLUE;
+		default:
+			return t.length() == 2 ? PathConfig.WINDOW_BLUE : PathConfig.WINDOW_BLUE;
 		}
 	}
 

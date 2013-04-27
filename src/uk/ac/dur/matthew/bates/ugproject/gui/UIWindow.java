@@ -74,6 +74,9 @@ public class UIWindow extends JFrame
 	private boolean uShowPathNodes = true;
 	private boolean uShowWelders = true;
 	private boolean uShowTessellation = true;
+	private boolean uShowPossibleConnectionsForSelectedRoom = false;
+	private boolean uShowDoorConnectionsForSelectedRoom = false;
+	private boolean uShowTree = false;
 
 	private Rect mSelectedRoom;
 
@@ -303,6 +306,7 @@ public class UIWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
+				floorPlan = new FloorPlan(floorPlan, floorPlan.roomTypes());
 				floorPlan = floorPlan.normalizeRoomSizes();
 				txtFloorPlanHeight.setText("" + floorPlan.height());
 				txtFloorPlanWidth.setText("" + floorPlan.width());
@@ -317,6 +321,16 @@ public class UIWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
+				// TODO Placeholder
+				System.out.println("TESSELLATION PROBLEMS: " + floorPlan.numberOfTessellationProblems());
+				System.out.println("ROOM SIZE PROBLEMS: " + floorPlan.roomSizeProblemIndex());
+				System.out.println("UNREACHABLE ROOMS: " + floorPlan.unreachableRooms(0));
+				System.out.println("GRAPH DISTANCE: " + floorPlan.connectivityGraphDistance(0));
+				System.out.println("TREE: " + floorPlan.iNodeTreeEdges(0));
+				System.out.println("PRIVACY: " + floorPlan.privacyProblems(0));
+				List<ArrayList<Integer>> xs = new ArrayList<ArrayList<Integer>>();
+				floorPlan.newDFS(xs, null, null, 0, 0);
+				System.out.println("DFS: " + xs);
 				MapGenerator mg = new MapGenerator(floorPlan);
 				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "maps/UGProject/maps/map01.map");
 			}
@@ -334,12 +348,14 @@ public class UIWindow extends JFrame
 	{
 		List<Double> roomAreas = new ArrayList<Double>();
 		Random r = new Random();
-		for (int i = 1; i <= 9; i++)
+		int n = r.nextInt(3);
+		for (int i = 1; i <= 9 + n; i++)
 		{
 			if (i > 6) roomAreas.add((double) (r.nextInt(2) + 3));
 			else roomAreas.add((double) (r.nextInt(3) + 3));
 		}
-		Collections.shuffle(roomAreas);
+		Collections.sort(roomAreas);
+		Collections.reverse(roomAreas);
 		return new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) roomAreas);
 	}
 
@@ -444,11 +460,19 @@ public class UIWindow extends JFrame
 						floorPlan = floorPlan.increaseHeightOfRoomByID(floorPlan.getIDByRoomBound(mSelectedRoom));
 						break;
 					case KeyEvent.VK_N:
-						System.out.println(floorPlan.welders().size());
-						System.out.println(floorPlan.numberOfTessellationProblems());
+						floorPlan = new FloorPlan(floorPlan, floorPlan.roomTypes());
 						floorPlan = floorPlan.normalizeRoomSizes();
-						System.out.println(floorPlan.welders().size());
-						System.out.println(floorPlan.numberOfTessellationProblems());
+						txtFloorPlanHeight.setText("" + floorPlan.height());
+						txtFloorPlanWidth.setText("" + floorPlan.width());
+						break;
+					case KeyEvent.VK_C:
+						uShowPossibleConnectionsForSelectedRoom = !uShowPossibleConnectionsForSelectedRoom;
+						break;
+					case KeyEvent.VK_D:
+						uShowDoorConnectionsForSelectedRoom = !uShowDoorConnectionsForSelectedRoom;
+						break;
+					case KeyEvent.VK_T:
+						uShowTree = !uShowTree;
 						break;
 					default:
 						break;
@@ -872,6 +896,122 @@ public class UIWindow extends JFrame
 					g.setStroke(new BasicStroke(1));
 				}
 			}
+
+			if (uShowPossibleConnectionsForSelectedRoom)
+			{
+				if (mSelectedRoom != null)
+				{
+					Rect r = mSelectedRoom;
+					int x = r.x * scale + scale;
+					int y = r.y * scale + scale;
+					int w = r.width * scale;
+					int h = r.height * scale;
+					int s = x + (w >> 1);
+					int t = y + (h >> 1);
+					int u = s;
+					int v = t;
+
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setColor(Color.RED);
+					g.fillOval(s - 10, t - 10, 20, 20);
+
+					for (int i : floorPlan.getAdjacents(floorPlan.getIDByRoomBound(mSelectedRoom)))
+					{
+						r = floorPlan.roomBounds().get(i);
+						x = r.x * scale + scale;
+						y = r.y * scale + scale;
+						w = r.width * scale;
+						h = r.height * scale;
+						s = x + (w >> 1);
+						t = y + (h >> 1);
+						g.setColor(Color.RED);
+						g.drawLine(s, t, u, v);
+						g.fillOval(s - 10, t - 10, 20, 20);
+					}
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+				}
+			}
+
+			if (uShowDoorConnectionsForSelectedRoom)
+			{
+				if (mSelectedRoom != null)
+				{
+					Rect r = mSelectedRoom;
+					int x = r.x * scale + scale;
+					int y = r.y * scale + scale;
+					int w = r.width * scale;
+					int h = r.height * scale;
+					int s = x + (w >> 1);
+					int t = y + (h >> 1);
+					int u = s;
+					int v = t;
+
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setColor(Color.BLUE);
+					g.fillOval(s - 10, t - 10, 20, 20);
+
+					for (int i : floorPlan.getDoorAdjacents(floorPlan.getIDByRoomBound(mSelectedRoom)))
+					{
+						r = floorPlan.roomBounds().get(i);
+						x = r.x * scale + scale;
+						y = r.y * scale + scale;
+						w = r.width * scale;
+						h = r.height * scale;
+						s = x + (w >> 1);
+						t = y + (h >> 1);
+						g.setColor(Color.BLUE);
+						g.drawLine(s, t, u, v);
+						g.fillOval(s - 10, t - 10, 20, 20);
+					}
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+				}
+			}
+
+			if (uShowTree)
+			{
+				if (mSelectedRoom != null)
+				{
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setColor(new Color(238, 48, 167));
+					g.setStroke(new BasicStroke(2));
+
+					int n = floorPlan.getIDByRoomBound(mSelectedRoom);
+
+					List<Point> xs = floorPlan.iNodeTreeEdges(n);
+
+					Set<Integer> ys = new HashSet<Integer>();
+
+					for (Point p : xs)
+					{
+						ys.add(p.x);
+						ys.add(p.y);
+
+						Point u = scaledMidPoint(floorPlan.roomBounds().get(p.x), scale);
+						Point v = scaledMidPoint(floorPlan.roomBounds().get(p.y), scale);
+
+						g.drawLine(u.x, u.y, v.x, v.y);
+					}
+
+					for (int i : ys)
+					{
+						Point p = scaledMidPoint(floorPlan.roomBounds().get(i), scale);
+						g.fillOval(p.x - 10, p.y - 10, 20, 20);
+					}
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+				}
+			}
+		}
+
+		public Point scaledMidPoint(Rect r, int scale)
+		{
+			int x = r.x * scale + scale;
+			int y = r.y * scale + scale;
+			int w = r.width * scale;
+			int h = r.height * scale;
+			int s = x + (w >> 1);
+			int t = y + (h >> 1);
+
+			return new Point(s, t);
 		}
 
 		class SelectRoomTypePopUp extends JPopupMenu

@@ -61,16 +61,6 @@ public class Rect
 		return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
 	}
 
-	public void inset(int dx, int dy)
-	{
-		// TODO unimplemented method
-	}
-
-	public void offset(int dx, int dy)
-	{
-		// TODO unimplemented method
-	}
-
 	public Point midpoint()
 	{
 		return new Point(x + (width >> 1), y + (height >> 1));

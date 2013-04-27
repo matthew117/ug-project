@@ -1,5 +1,6 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
+
 public class WallConnection
 {	
 	// Door will open towards the back-facing wall

@@ -1,4 +1,10 @@
-package uk.ac.dur.matthew.bates.ugproject.model;
+package uk.ac.dur.matthew.bates.ugproject.generators;
+
+import uk.ac.dur.matthew.bates.ugproject.model.DoorPlacingRule;
+import uk.ac.dur.matthew.bates.ugproject.model.Line;
+import uk.ac.dur.matthew.bates.ugproject.model.Point;
+import uk.ac.dur.matthew.bates.ugproject.model.Wall;
+
 
 
 public class SimpleDoorPlacementRule implements DoorPlacingRule

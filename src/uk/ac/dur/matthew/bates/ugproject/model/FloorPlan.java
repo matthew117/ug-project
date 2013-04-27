@@ -7,6 +7,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import uk.ac.dur.matthew.bates.ugproject.generators.BFSRoomAllocation;
+import uk.ac.dur.matthew.bates.ugproject.generators.ConnectStatsDoorPlacementRule;
 import uk.ac.dur.matthew.bates.ugproject.generators.Squarify;
 import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 
@@ -32,9 +34,10 @@ public class FloorPlan
 		mRoomBounds = Squarify.squarify(areas, new RectF(0, 0, width, height));
 	}
 
-	public FloorPlan(List<Rect> roomBounds)
+	public FloorPlan(List<Rect> roomBounds, List<RoomType> roomTypes)
 	{
 		mRoomBounds = roomBounds;
+		this.mRoomTypes = new ArrayList<Room.RoomType>(roomTypes);
 	}
 
 	public FloorPlan(FloorPlan org, List<RoomType> roomTypes)
@@ -44,23 +47,14 @@ public class FloorPlan
 			a.add((double) i);
 		this.mAreas = a;
 		this.mRoomBounds = new ArrayList<Rect>(org.roomBounds());
-
-		List<Room> rooms = new ArrayList<Room>();
-		List<Rect> roomBounds = roomBounds();
-		for (int i = 0; i < roomBounds.size(); i++)
-		{
-			Rect r = roomBounds.get(i);
-			rooms.add(new Room(r, i, roomTypes.get(i)));
-		}
-
-		this.mRooms = rooms;
+		this.mRoomTypes = new ArrayList<Room.RoomType>(roomTypes);
 	}
 
 	public FloorPlan(int width, int height, ArrayList<Double> areas, List<RoomType> roomTypes)
 	{
 		mAreas = new ArrayList<Double>(areas);
 		mRoomBounds = Squarify.squarify(areas, new RectF(0, 0, width, height));
-		mRoomTypes = roomTypes;
+		mRoomTypes = new ArrayList<Room.RoomType>(roomTypes);
 	}
 
 	public List<Rect> roomBounds()
@@ -71,25 +65,24 @@ public class FloorPlan
 	public List<Room> rooms()
 	{
 		if (mRooms != null) return mRooms;
-		if (mRoomTypes != null)
+
+		mRooms = new ArrayList<Room>();
+		for (int i = 0; i < roomTypes().size(); i++)
 		{
-			List<Room> rooms = new ArrayList<Room>();
-			List<Rect> roomBounds = roomBounds();
-			for (int i = 0; i < roomBounds.size(); i++)
-			{
-				Rect r = roomBounds.get(i);
-				rooms.add(new Room(r, i, mRoomTypes.get(i)));
-			}
-			return rooms;
-		}
-		RoomAllocationRule rule = new RandomStackRoomAllocation();
-		mRooms = rule.allocateRooms(this);
-		mRoomTypes = new ArrayList<Room.RoomType>();
-		for (Room r : mRooms)
-		{
-			mRoomTypes.add(r.type());
+			mRooms.add(new Room(roomBounds().get(i), i, roomTypes().get(i)));
 		}
 		return mRooms;
+	}
+
+	public List<RoomType> roomTypes()
+	{
+		if (mRoomTypes != null) return mRoomTypes;
+
+		List<RoomType> roomTypeList = new ArrayList<Room.RoomType>();
+		RoomAllocationRule rule = new BFSRoomAllocation();
+		roomTypeList = rule.allocateRoomTypes(0, this);
+		mRoomTypes = roomTypeList;
+		return roomTypeList;
 	}
 
 	public List<Integer> areas()
@@ -222,11 +215,11 @@ public class FloorPlan
 		}
 		return false;
 	}
-	
+
 	public boolean couldBeWindow(Wall q)
 	{
 		if (q.length() != 4) return false;
-		
+
 		for (WallConnection c : wallConnections())
 		{
 			Line a = Line.overlap(c.frontFacing(), q);
@@ -234,7 +227,7 @@ public class FloorPlan
 			if (a == null || b == null) continue;
 			if (a.length() > 1 || b.length() > 1) return false;
 		}
-		
+
 		return true;
 	}
 
@@ -258,16 +251,6 @@ public class FloorPlan
 			}
 		}
 		return dcs;
-	}
-
-	public List<RoomType> roomTypes()
-	{
-		List<RoomType> roomTypeList = new ArrayList<Room.RoomType>();
-		for (Room r : rooms())
-		{
-			roomTypeList.add(r.type());
-		}
-		return roomTypeList;
 	}
 
 	public FloorPlan changeRoomType(int roomID, RoomType type)
@@ -335,7 +318,6 @@ public class FloorPlan
 
 					for (int i = 0; b.q.y + i < left.q.y;)
 					{
-						System.out.println("odguidg");
 						if (left.q.y - (b.q.y + i) >= 4)
 						{
 							tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r, Wall.WEST));
@@ -688,10 +670,378 @@ public class FloorPlan
 		return sum;
 	}
 
+	public List<Integer> roomSizeProblemIndex()
+	{
+		List<Integer> xs = new ArrayList<Integer>();
+		for (Room r : rooms())
+		{
+			int area = r.height * r.width;
+			Point minMax = minMaxRoomSize(r.type());
+			int min = minMax.x;
+			int max = minMax.y;
+
+			if (area < min) xs.add(-Math.abs(min - area));
+			else xs.add(Math.abs(max - area));
+		}
+		return xs;
+	}
+
+	private Point minMaxRoomSize(RoomType t)
+	{
+		switch (t)
+		{
+		case BATHROOM:
+			return new Point(16, 24);
+		case BEDROOM:
+			return new Point(16, 30);
+		case CORRIDOR:
+			return new Point(20, 40);
+		case DINING_ROOM:
+			return new Point(16, 28);
+		case FOYER:
+			return new Point(16, 32);
+		case GUEST_ROOM:
+			return new Point(12, 30);
+		case KITCHEN:
+			return new Point(16, 28);
+		case LAUNDRY:
+			return new Point(16, 12);
+		case LIVING_ROOM:
+			return new Point(16, 28);
+		case MASTER_BEDROOM:
+			return new Point(18, 35);
+		case STORAGE:
+			return new Point(16, 16);
+		case STUDY:
+			return new Point(16, 18);
+		case TOILET:
+			return new Point(16, 20);
+		default:
+			return new Point(0, Integer.MAX_VALUE);
+		}
+	}
+
+	public List<Integer> unreachableRooms(int root)
+	{
+		Queue<Integer> q = new ArrayBlockingQueue<Integer>(n());
+		Set<Integer> seen = new HashSet<Integer>();
+
+		q.add(root);
+		seen.add(root);
+
+		while (!q.isEmpty())
+		{
+			int n = q.poll();
+
+			for (int i : getDoorAdjacents(n))
+			{
+				if (!seen.contains(i))
+				{
+					seen.add(i);
+					q.add(i);
+				}
+			}
+		}
+
+		List<Integer> xs = new ArrayList<Integer>();
+		for (int i = 0; i < n(); i++)
+		{
+			if (!seen.contains(i)) xs.add(i);
+		}
+		return xs;
+	}
+
+	public int n()
+	{
+		return roomBounds().size();
+	}
+
+	class INode
+	{
+		private int mValue;
+		private INode mParent;
+		private List<INode> mChildren;
+
+		INode(int x, INode parent, List<INode> xs)
+		{
+			mValue = x;
+			mParent = parent;
+			mChildren = xs;
+		}
+
+		int value()
+		{
+			return mValue;
+		}
+
+		List<INode> children()
+		{
+			return mChildren;
+		}
+
+		INode parent()
+		{
+			return mParent;
+		}
+
+		public String toString()
+		{
+			return "" + mValue;
+		}
+	}
+
+	public INode iNodeTreeRoot(int root)
+	{
+		Queue<INode> q = new ArrayBlockingQueue<INode>(n());
+		Set<Integer> seen = new HashSet<Integer>();
+
+		INode rootNode = new INode(root, null, new ArrayList<INode>());
+		q.add(rootNode);
+		seen.add(root);
+
+		while (!q.isEmpty())
+		{
+			INode n = q.poll();
+
+			for (int i : getDoorAdjacents(n.value()))
+			{
+				if (!seen.contains(i))
+				{
+					INode m = new INode(i, n, new ArrayList<INode>());
+					n.children().add(m);
+					m.mParent = n;
+					seen.add(i);
+					q.add(m);
+				}
+			}
+		}
+
+		return rootNode;
+	}
+
+	public List<Point> iNodeTreeEdges(int root)
+	{
+		Queue<Integer> q = new ArrayBlockingQueue<Integer>(n());
+		Set<Integer> seen = new HashSet<Integer>();
+		List<Point> xs = new ArrayList<Point>();
+
+		q.add(root);
+		seen.add(root);
+
+		while (!q.isEmpty())
+		{
+			int n = q.poll();
+
+			for (int i : getDoorAdjacents(n))
+			{
+				if (!seen.contains(i))
+				{
+					xs.add(new Point(n, i));
+
+					seen.add(i);
+					q.add(i);
+				}
+			}
+		}
+
+		return xs;
+	}
+
+	public List<ArrayList<Integer>> dfsRoutes(int root)
+	{
+		List<ArrayList<Integer>> xss = new ArrayList<ArrayList<Integer>>();
+
+		Queue<Integer> q = new ArrayBlockingQueue<Integer>(n());
+		Set<Integer> seen = new HashSet<Integer>();
+
+		q.add(root);
+		seen.add(root);
+
+		ArrayList<Integer> ys = new ArrayList<Integer>();
+		ys.add(root);
+		xss.add(ys);
+
+		while (!q.isEmpty())
+		{
+			int n = q.poll();
+
+			List<Integer> doorAdjacents = getDoorAdjacents(n);
+			for (int k = 0; k < doorAdjacents.size(); k++)
+			{
+				int i = doorAdjacents.get(k);
+
+				if (!seen.contains(i))
+				{
+					if (k > 0)
+					{
+						ArrayList<Integer> xs = new ArrayList<Integer>(xss.get(xss.size() - 1));
+						xs.add(i);
+						xss.add(xs);
+					}
+					else
+					{
+						ArrayList<Integer> xs = xss.get(xss.size() - 1);
+						xs.add(i);
+						xss.add(xs);
+					}
+					seen.add(i);
+					q.add(i);
+				}
+			}
+		}
+
+		return xss;
+	}
+
+	public void newDFS(List<ArrayList<Integer>> xss, ArrayList<Integer> xs, INode n, int root, int depth)
+	{
+		if (n != null)
+		{
+			if (n.children().isEmpty()) return;
+		}
+
+		if (xs == null)
+		{
+			n = iNodeTreeRoot(root);
+			xs = new ArrayList<Integer>();
+			xs.add(root);
+			xss.add(xs);
+		}
+
+		ArrayList<Integer> ys = new ArrayList<Integer>(xs);
+		List<INode> children = n.children();
+		for (int i = 0; i < children.size(); i++)
+		{
+			INode m = children.get(i);
+
+			if (i == 0)
+			{
+				xs.add(m.value());
+				newDFS(xss, xs, m, root, depth++);
+			}
+			else
+			{
+				ArrayList<Integer> zs = new ArrayList<Integer>(ys);
+				xss.add(zs);
+				zs.add(m.value());
+				newDFS(xss, zs, m, root, depth++);
+			}
+		}
+
+	}
+
+	public int connectivityGraphDistance(int root)
+	{
+		int max = 0;
+		List<ArrayList<Integer>> xss = new ArrayList<ArrayList<Integer>>();
+		newDFS(xss, null, null, root, 0);
+		for (ArrayList<Integer> xs : xss)
+		{
+			if (xs.size() > max) max = xs.size();
+		}
+		return max;
+	}
+
+	public List<ArrayList<RoomType>> privacyProblems(int root)
+	{
+		List<ArrayList<RoomType>> xss = new ArrayList<ArrayList<RoomType>>();
+		List<ArrayList<Integer>> yss = new ArrayList<ArrayList<Integer>>();
+		newDFS(yss, null, null, root, 0);
+		for (ArrayList<Integer> ys : yss)
+		{
+			boolean hasPassedPublic = false;
+			boolean problem = false;
+			for (Integer i : ys)
+			{
+				if (hasPassedPublic && roomTypes().get(i).isPublic())
+				{
+					problem = true;
+					break;
+				}
+				else
+				{
+					if (roomTypes().get(i).isPrivate()) hasPassedPublic = true;
+				}
+			}
+
+			if (problem)
+			{
+				ArrayList<RoomType> xs = new ArrayList<RoomType>();
+				for (Integer j : ys)
+				{
+					xs.add(roomTypes().get(j));
+				}
+				xss.add(xs);
+			}
+		}
+
+		return xss;
+	}
+
+	public List<Integer> getAdjacents(int roomID)
+	{
+		Rect r = roomBounds().get(roomID);
+		List<Integer> xs = new ArrayList<Integer>();
+		for (int i = 0; i < roomBounds().size(); i++)
+		{
+			Rect s = roomBounds().get(i);
+			if (FeatureDetection.isDirectlyAbove(r, s) && Line.overlap(r.bottom(), s.top()).length() >= 4) xs.add(i);
+			if (FeatureDetection.isDirectlyBelow(r, s) && Line.overlap(r.top(), s.bottom()).length() >= 4) xs.add(i);
+			if (FeatureDetection.isDirectlyLeftOf(r, s) && Line.overlap(r.right(), s.left()).length() >= 4) xs.add(i);
+			if (FeatureDetection.isDirectlyRightOf(r, s) && Line.overlap(r.left(), s.right()).length() >= 4) xs.add(i);
+		}
+		return xs;
+	}
+
+	public List<Point> getDoorEdges()
+	{
+		List<Point> xs = new ArrayList<Point>();
+
+		for (DoorConnection x : doorConnections())
+		{
+			xs.add(new Point(x.frontFacing().parent().id(), x.backFacing().parent().id()));
+		}
+
+		return xs;
+	}
+
+	public List<Integer> getDoorAdjacents(int roomID)
+	{
+		List<Integer> xs = new ArrayList<Integer>();
+
+		for (Point p : getDoorEdges())
+		{
+			if (p.x == roomID) xs.add(p.y);
+			if (p.y == roomID) xs.add(p.x);
+		}
+
+		return xs;
+	}
+
+	public List<Integer> breadthFirstTransversal(int roomID)
+	{
+		Queue<Integer> Q = new ArrayBlockingQueue<Integer>(roomBounds().size());
+		List<Integer> m = new ArrayList<Integer>();
+		Q.add(roomID);
+		m.add(roomID);
+		while (!Q.isEmpty())
+		{
+			int i = Q.poll();
+			for (int j : getAdjacents(i))
+			{
+				if (!m.contains(j))
+				{
+					m.add(j);
+					Q.add(j);
+				}
+			}
+		}
+		return m;
+	}
+
 	public FloorPlan normalizeRoomSizes()
 	{
-		FloorPlan nFP = new FloorPlan(this.width(), this.height(), new ArrayList<Double>(mAreas),
-				new ArrayList<RoomType>(mRoomTypes));
+		FloorPlan nFP = new FloorPlan(this, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < nFP.roomBounds().size(); i++)
 		{
 			Rect r = nFP.roomBounds().get(i);
@@ -711,7 +1061,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -727,7 +1077,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -743,7 +1093,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -759,7 +1109,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -775,7 +1125,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -791,7 +1141,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -807,7 +1157,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);
@@ -823,7 +1173,7 @@ public class FloorPlan
 		if (roomID > roomBounds().size() || roomID < 0) return this;
 		List<Rect> rb = new ArrayList<Rect>(roomBounds());
 		Rect a = rb.get(roomID);
-		FloorPlan newFP = new FloorPlan(rb);
+		FloorPlan newFP = new FloorPlan(rb, new ArrayList<Room.RoomType>(roomTypes()));
 		for (int i = 0; i < rb.size(); i++)
 		{
 			Rect b = rb.get(i);

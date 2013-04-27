@@ -8,7 +8,6 @@ public class Group
 
 	public Group()
 	{
-		// TODO Auto-generated constructor stub
 	}
 	
 	public String toString()
