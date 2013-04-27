@@ -50,28 +50,16 @@ public class MapData
 		areas = new ArrayList<Area>();
 		lights = new ArrayList<Light>();
 	}
-	
+
 	public int addObject(Primitive obj)
 	{
-		if (obj instanceof Entity)
-		{
-			return addEntity((Entity) obj);
-		}
-		if (obj instanceof StaticObject)
-		{
-			return addStaticObject((StaticObject) obj);
-		}
-		if (obj instanceof Light)
-		{
-			return addLight((Light) obj);
-		}
-		if (obj instanceof Area)
-		{
-			return addArea((Area) obj);
-		}
+		if (obj instanceof Entity) { return addEntity((Entity) obj); }
+		if (obj instanceof StaticObject) { return addStaticObject((StaticObject) obj); }
+		if (obj instanceof Light) { return addLight((Light) obj); }
+		if (obj instanceof Area) { return addArea((Area) obj); }
 		return addPrimitive(obj);
 	}
-	
+
 	public int addStaticObject(StaticObject obj)
 	{
 		String filePath = obj.getFilePath();
@@ -111,7 +99,7 @@ public class MapData
 		primitives.add(obj);
 		return obj.getId();
 	}
-	
+
 	public int addEntity(Entity obj)
 	{
 		String filePath = obj.getFilePath();
@@ -143,7 +131,7 @@ public class MapData
 
 		return obj.getId();
 	}
-	
+
 	public int addArea(Area a)
 	{
 		a.setId(nextID++);
@@ -157,7 +145,7 @@ public class MapData
 		areas.add(a);
 		return a.getId();
 	}
-	
+
 	public int addLight(Light l)
 	{
 		l.setId(nextID++);
@@ -358,7 +346,8 @@ public class MapData
 		s += "GlobalDecalMaxTris=\"" + globalDecalMaxTris + "\" ";
 		s += "Name=\"" + (name != null ? name : "") + "\" ";
 		s += "SkyBoxActive=\"" + skyBoxActive + "\" ";
-		s += "SkyBoxColor=\"" + skyBoxColor[0] + " " + skyBoxColor[1] + " " + skyBoxColor[2] + " " + skyBoxColor[3] + "\" ";
+		s += "SkyBoxColor=\"" + skyBoxColor[0] + " " + skyBoxColor[1] + " " + skyBoxColor[2] + " " + skyBoxColor[3]
+				+ "\" ";
 		s += "SkyBoxTexture=\"" + (skyBoxTexture != null ? skyBoxTexture : "") + "\">";
 		s += "\n    <MapContents>";
 		if (fileIndexStaticObjects.isEmpty())

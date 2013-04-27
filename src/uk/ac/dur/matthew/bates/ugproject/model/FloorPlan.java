@@ -202,9 +202,113 @@ public class FloorPlan
 		return new Rect(0, height() - (smallestRoomHeight() - 1), width(), (smallestRoomHeight() - 1));
 	}
 
+	public List<Room> getLeftMostRooms()
+	{
+		List<Room> xs = new ArrayList<Room>();
+		Rect b = leftExternalBound();
+		for (Room r : rooms())
+		{
+			if (r.intersects(b)) xs.add(r);
+		}
+		return xs;
+	}
+
+	public boolean isLeftMostRoom(Room r)
+	{
+		return getLeftMostRooms().contains(r);
+	}
+
+	public List<Room> getRightMostRooms()
+	{
+		List<Room> xs = new ArrayList<Room>();
+		Rect b = rightExternalBound();
+		for (Room r : rooms())
+		{
+			if (r.intersects(b)) xs.add(r);
+		}
+		return xs;
+	}
+
+	public boolean isRightMostRoom(Room r)
+	{
+		return getRightMostRooms().contains(r);
+	}
+
+	public List<Room> getTopMostRooms()
+	{
+		List<Room> xs = new ArrayList<Room>();
+		Rect b = topExternalBound();
+		for (Room r : rooms())
+		{
+			if (r.intersects(b)) xs.add(r);
+		}
+		return xs;
+	}
+
+	public boolean isTopMostRoom(Room r)
+	{
+		return getTopMostRooms().contains(r);
+	}
+
+	public List<Room> getBottomMostRooms()
+	{
+		List<Room> xs = new ArrayList<Room>();
+		Rect b = bottomExternalBound();
+		for (Room r : rooms())
+		{
+			if (r.intersects(b)) xs.add(r);
+		}
+		return xs;
+	}
+
+	public boolean isBottomMostRoom(Room r)
+	{
+		return getBottomMostRooms().contains(r);
+	}
+
+	public List<Room> getExternalRooms()
+	{
+		List<Room> xs = new ArrayList<Room>();
+		xs.addAll(getTopMostRooms());
+		xs.addAll(getRightMostRooms());
+		xs.addAll(getBottomMostRooms());
+		xs.addAll(getLeftMostRooms());
+		return xs;
+	}
+
+	public boolean isExternalRoom(Room r)
+	{
+		return getExternalRooms().contains(r);
+	}
+
+	public boolean isInternalRoom(Room r)
+	{
+		return !isExternalRoom(r);
+	}
+
+	public List<Room> getInternalRooms()
+	{
+		List<Room> xs = new ArrayList<Room>(rooms());
+		xs.removeAll(getExternalRooms());
+		return xs;
+	}
+
 	public boolean isExternalWall(Wall w)
 	{
 		return !isInternalWall(w);
+	}
+
+	public boolean isExternalWallNew(Wall w)
+	{
+		if (leftExternalBound().contains(w.p.x, w.p.y) && leftExternalBound().contains(w.q.x, w.q.y)
+				&& w.orientation() == Wall.WEST) return true;
+		if (rightExternalBound().contains(w.p.x, w.p.y) && rightExternalBound().contains(w.q.x, w.q.y)
+				&& w.orientation() == Wall.EAST) return true;
+		if (topExternalBound().contains(w.p.x, w.p.y) && topExternalBound().contains(w.q.x, w.q.y)
+				&& w.orientation() == Wall.SOUTH) return true;
+		if (bottomExternalBound().contains(w.p.x, w.p.y) && bottomExternalBound().contains(w.q.x, w.q.y)
+				&& w.orientation() == Wall.NORTH) return true;
+		return false;
 	}
 
 	public boolean isInternalWall(Wall w)
@@ -270,337 +374,189 @@ public class FloorPlan
 		return xs;
 	}
 
+	public List<Line> getDoorPlacements()
+	{
+		List<Line> xs = new ArrayList<Line>();
+		for (DoorConnection dc : doorConnections())
+		{
+			xs.add(dc.doorPlacement());
+		}
+		return xs;
+	}
+
 	public List<Tessellation> tessellation()
 	{
 		if (mTessellation != null) return mTessellation;
-		List<Tessellation> tessellation = new ArrayList<Tessellation>();
+		List<Tessellation> tessellationList = new ArrayList<Tessellation>();
 		for (Room r : rooms())
 		{
-			Line left = r.left();
-			int leftLen = (int) left.length();
-			List<DoorConnection> xs = relatedDoorConnections(new Wall(left, r, Wall.WEST));
-			if (!xs.isEmpty())
+			List<Tessellation> temp = new ArrayList<Tessellation>();
+
+			Line z;
+			int n;
+			int o;
+
+			// LEFT TESSELLATIONS ================================================================
+
+			z = r.left();
+			n = (int) z.length();
+			o = Wall.WEST;
+
+			for (int i = 0; i < n;)
 			{
-				for (DoorConnection dc : xs)
+				Line a = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 6);
+				Line t = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 4);
+				Line s = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 2);
+
+				i = complex(r, temp, n, o, i, a, t, s);
+			}
+
+			// RIGHT TESSELLATIONS ================================================================
+
+			z = r.right();
+			n = (int) z.length();
+			o = Wall.EAST;
+
+			for (int i = 0; i < n;)
+			{
+				Line a = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 6);
+				Line t = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 4);
+				Line s = new Line(z.p.x, z.p.y + i, z.q.x, z.p.y + i + 2);
+
+				i = complex(r, temp, n, o, i, a, t, s);
+			}
+
+			// TOP TESSELLATIONS ================================================================
+
+			z = r.top();
+			n = (int) z.length();
+			o = Wall.SOUTH;
+
+			for (int i = 0; i < n;)
+			{
+				Line a = new Line(z.p.x + i, z.p.y, z.p.x + i + 6, z.q.y);
+				Line t = new Line(z.p.x + i, z.p.y, z.p.x + i + 4, z.q.y);
+				Line s = new Line(z.p.x + i, z.p.y, z.p.x + i + 2, z.q.y);
+
+				i = complex(r, temp, n, o, i, a, t, s);
+
+			}
+
+			// BOTTOM TESSELLATIONS ================================================================
+
+			z = r.bottom();
+			n = (int) z.length();
+			o = Wall.NORTH;
+
+			for (int i = 0; i < n;)
+			{
+				Line a = new Line(z.p.x + i, z.p.y, z.p.x + i + 6, z.q.y);
+				Line t = new Line(z.p.x + i, z.p.y, z.p.x + i + 4, z.q.y);
+				Line s = new Line(z.p.x + i, z.p.y, z.p.x + i + 2, z.q.y);
+
+				i = complex(r, temp, n, o, i, a, t, s);
+			}
+
+			tessellationList.addAll(temp);
+		}
+		mTessellation = tessellationList;
+		return mTessellation;
+	}
+
+	protected int complex(Room r, List<Tessellation> temp, int n, int o, int i, Line a, Line t, Line s)
+	{
+		if (partOfDoorTessellation(t) && partOfDoorTessellation(s))
+		{
+			i += 2;
+			return i;
+		}
+
+		if (partOfDoorTessellation(t) && !partOfDoorTessellation(s))
+		{
+			temp.add(new Tessellation(s, r, o));
+			i += 2;
+			return i;
+		}
+
+		if (isDoorTessellation(t))
+		{
+			temp.add(new Tessellation(t, r, o, Tessellation.Type.DOOR));
+			i += 4;
+			return i;
+		}
+
+		if (n - i >= 4)
+		{
+
+			if (isExternalWallNew(new Wall(t, r, o)))
+			{
+				if ((r.type() == RoomType.LIVING_ROOM || r.type() == RoomType.KITCHEN
+						|| r.type() == RoomType.GUEST_ROOM || r.type() == RoomType.FOYER)
+						&& !containsTessellationType(temp, Tessellation.Type.STOVE))
 				{
-					Line a = dc.leftWallSegment();
-					Line b = dc.rightWallSegment();
-					int aLenth = (int) a.length();
-					int bLength = (int) b.length();
+					temp.add(new Tessellation(t, r, o, Tessellation.Type.STOVE));
+					i += 4;
+					return i;
+				}
 
-					for (int i = 0; i < aLenth;)
-					{
-						if (aLenth - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r,
-									Wall.WEST));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r,
-									Wall.WEST));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; i < bLength;)
-					{
-						if (bLength - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
-									Wall.WEST));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
-									Wall.WEST));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; b.q.y + i < left.q.y;)
-					{
-						if (left.q.y - (b.q.y + i) >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
-									Wall.WEST));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
-									Wall.WEST));
-							i += 2;
-						}
-					}
+				if ((n - i >= 6) && (r.type() == RoomType.LIVING_ROOM || r.type() == RoomType.MASTER_BEDROOM
+						|| r.type() == RoomType.GUEST_ROOM || r.type() == RoomType.FOYER || r.type() == RoomType.STUDY))
+				{
+					temp.add(new Tessellation(a, r, o, Tessellation.Type.ALCOVE));
+					i += 6;
+				}
+				else
+				{
+					temp.add(new Tessellation(t, r, o, Tessellation.Type.WINDOW));
+					i += 4;
 				}
 			}
 			else
 			{
-				for (int i = 0; i < leftLen;)
-				{
-					if (leftLen - i >= 4)
-					{
-						tessellation.add(new Tessellation(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 4),
-								r, Wall.WEST));
-						i += 4;
-					}
-					else
-					{
-						tessellation.add(new Tessellation(new Line(left.p.x, left.p.y + i, left.q.x, left.p.y + i + 2),
-								r, Wall.WEST));
-						i += 2;
-					}
-				}
+				temp.add(new Tessellation(t, r, o));
+				i += 4;
 			}
 
-			Line right = r.right();
-			int rightLen = (int) right.length();
-			xs = relatedDoorConnections(new Wall(right, r, Wall.EAST));
-			if (!xs.isEmpty())
+		}
+		else
+		{
+			temp.add(new Tessellation(s, r, o));
+			i += 2;
+		}
+		return i;
+	}
+
+	private static boolean containsTessellationType(List<Tessellation> xs, Tessellation.Type t)
+	{
+		for (Tessellation s : xs)
+		{
+			if (s.type() == t) return true;
+		}
+		return false;
+	}
+
+	public boolean isDoorTessellation(Line x)
+	{
+		for (Line y : getDoorPlacements())
+		{
+			if ((x.isHorizontal() && y.isHorizontal()) || (x.isVertical() && y.isVertical()))
 			{
-				for (DoorConnection dc : xs)
-				{
-					Line a = dc.leftWallSegment();
-					Line b = dc.rightWallSegment();
-					int aLenth = (int) a.length();
-					int bLength = (int) b.length();
-
-					for (int i = 0; i < aLenth;)
-					{
-						if (aLenth - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 4), r,
-									Wall.EAST));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x, a.p.y + i, a.q.x, a.p.y + i + 2), r,
-									Wall.EAST));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; i < bLength;)
-					{
-						if (bLength - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
-									Wall.EAST));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
-									Wall.EAST));
-							i += 2;
-						}
-					}
-				}
-
-				// TODO just do it normally but if next tessellation is door..
-
-				// for (int i = 0; b.q.y + i < right.q.y;)
-				// {
-				// System.out.println("odguidg");
-				// if (right.q.y - (b.q.y + i) >= 4)
-				// {
-				// tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 4), r,
-				// Wall.EAST));
-				// i += 4;
-				// }
-				// else
-				// {
-				// tessellation.add(new Wall(new Line(b.p.x, b.p.y + i, b.q.x, b.p.y + i + 2), r,
-				// Wall.EAST));
-				// i += 2;
-				// }
-				// }
-			}
-			else
-			{
-				for (int i = 0; i < rightLen;)
-				{
-					if (rightLen - i >= 4)
-					{
-						tessellation.add(new Tessellation(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i
-								+ 4), r, Wall.EAST));
-						i += 4;
-					}
-					else
-					{
-						tessellation.add(new Tessellation(new Line(right.p.x, right.p.y + i, right.q.x, right.p.y + i
-								+ 2), r, Wall.EAST));
-						i += 2;
-					}
-				}
-			}
-
-			Line top = r.top();
-			int topLen = (int) top.length();
-			xs = relatedDoorConnections(new Wall(top, r, Wall.SOUTH));
-			if (!xs.isEmpty())
-			{
-				for (DoorConnection dc : xs)
-				{
-					Line a = dc.leftWallSegment();
-					Line b = dc.rightWallSegment();
-					int aLenth = (int) a.length();
-					int bLength = (int) b.length();
-
-					for (int i = 0; i < aLenth;)
-					{
-						if (aLenth - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r,
-									Wall.SOUTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r,
-									Wall.SOUTH));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; i < bLength;)
-					{
-						if (bLength - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
-									Wall.SOUTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
-									Wall.SOUTH));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; b.q.x + i < top.q.x;)
-					{
-						if (top.q.x - (b.q.x + i) >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
-									Wall.SOUTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
-									Wall.SOUTH));
-							i += 2;
-						}
-					}
-				}
-			}
-			else
-			{
-				for (int i = 0; i < topLen;)
-				{
-					if (topLen - i >= 4)
-					{
-						tessellation.add(new Tessellation(new Line(top.p.x + i, top.p.y, top.p.x + i + 4, top.q.y), r,
-								Wall.SOUTH));
-						i += 4;
-					}
-					else
-					{
-						tessellation.add(new Tessellation(new Line(top.p.x + i, top.p.y, top.p.x + i + 2, top.q.y), r,
-								Wall.SOUTH));
-						i += 2;
-					}
-				}
-			}
-
-			Line bottom = r.bottom();
-			int bottomLen = (int) bottom.length();
-			xs = relatedDoorConnections(new Wall(bottom, r, Wall.NORTH));
-			if (!xs.isEmpty())
-			{
-				for (DoorConnection dc : xs)
-				{
-					Line a = dc.leftWallSegment();
-					Line b = dc.rightWallSegment();
-					int aLenth = (int) a.length();
-					int bLength = (int) b.length();
-
-					for (int i = 0; i < aLenth;)
-					{
-						if (aLenth - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 4, a.q.y), r,
-									Wall.NORTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(a.p.x + i, a.p.y, a.p.x + i + 2, a.q.y), r,
-									Wall.NORTH));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; i < bLength;)
-					{
-						if (bLength - i >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
-									Wall.NORTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
-									Wall.NORTH));
-							i += 2;
-						}
-					}
-
-					for (int i = 0; b.q.x + i < bottom.q.x;)
-					{
-						if (bottom.q.x - (b.q.x + i) >= 4)
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 4, b.q.y), r,
-									Wall.NORTH));
-							i += 4;
-						}
-						else
-						{
-							tessellation.add(new Tessellation(new Line(b.p.x + i, b.p.y, b.p.x + i + 2, b.q.y), r,
-									Wall.NORTH));
-							i += 2;
-						}
-					}
-				}
-			}
-			else
-			{
-				for (int i = 0; i < bottomLen;)
-				{
-					if (bottomLen - i >= 4)
-					{
-						tessellation.add(new Tessellation(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 4,
-								bottom.q.y), r, Wall.NORTH));
-						i += 4;
-					}
-					else
-					{
-						tessellation.add(new Tessellation(new Line(bottom.p.x + i, bottom.p.y, bottom.p.x + i + 2,
-								bottom.q.y), r, Wall.NORTH));
-						i += 2;
-					}
-				}
+				if (x.equals(y)) return true;
 			}
 		}
-		mTessellation = tessellation;
-		return mTessellation;
+		return false;
+	}
+
+	public boolean partOfDoorTessellation(Line x)
+	{
+		for (Line y : getDoorPlacements())
+		{
+			if ((x.isHorizontal() && y.isHorizontal()) || (x.isVertical() && y.isVertical()))
+			{
+				if (Line.overlap(x, y) != null && Line.overlap(x, y).length() > 0 && !x.equals(y)) return true;
+			}
+		}
+		return false;
 	}
 
 	public Node pathRoot()

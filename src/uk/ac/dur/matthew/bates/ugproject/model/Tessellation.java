@@ -4,7 +4,7 @@ public class Tessellation extends Wall
 {
 	public enum Type
 	{
-		WALL, WINDOW, ALCOVE, STOVE;
+		DOOR, WALL, WINDOW, ALCOVE, STOVE;
 	}
 
 	private Type type = Type.WALL;
@@ -25,7 +25,11 @@ public class Tessellation extends Wall
 		super(line.p.x, line.p.y, line.q.x, line.q.y, r, angle);
 	}
 	
-	
+	public Tessellation(Line line, Room r, int angle, Tessellation.Type type)
+	{
+		super(line.p.x, line.p.y, line.q.x, line.q.y, r, angle);
+		this.type = type;
+	}
 
 	@Override
 	public int hashCode()
@@ -36,9 +40,15 @@ public class Tessellation extends Wall
 	@Override
 	public boolean equals(Object o)
 	{
-		Line a = (Line)this;
-		Line b = (Line)o;
-		return a.equals(b) && this.type == ((Tessellation)o).type;
+		Line a = (Line) this;
+		Line b = (Line) o;
+		return equalsLine(a, b) && this.type == ((Tessellation) o).type;
+	}
+
+	public boolean equalsLine(Line a, Line b)
+	{
+
+		return a.p.equals(b.p) && a.q.equals(b.q);
 	}
 
 	public Type type()

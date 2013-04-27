@@ -47,6 +47,7 @@ import uk.ac.dur.matthew.bates.ugproject.model.Point;
 import uk.ac.dur.matthew.bates.ugproject.model.Rect;
 import uk.ac.dur.matthew.bates.ugproject.model.Room;
 import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
+import uk.ac.dur.matthew.bates.ugproject.model.Tessellation;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
 import uk.ac.dur.matthew.bates.ugproject.model.WallConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.Welder;
@@ -827,10 +828,25 @@ public class UIWindow extends JFrame
 
 			if (uShowTessellation)
 			{
-				for (Wall t : floorPlan.tessellation())
+				for (Tessellation t : floorPlan.tessellation())
 				{
-					g.setStroke(new BasicStroke(1));
-					g.setColor(Color.BLACK);
+					g.setStroke(new BasicStroke(3));
+					switch (t.type())
+					{
+					case ALCOVE:
+						g.setColor(Color.MAGENTA); break;
+					case STOVE:
+						g.setColor(Color.GREEN); break;
+					case WALL:
+						g.setColor(Color.BLACK); break;
+					case WINDOW:
+						g.setColor(Color.CYAN); break;
+					case DOOR:
+						g.setColor(Color.RED); break;
+					default:
+						g.setColor(Color.BLACK); break;
+
+					}
 					int px = t.p.x * scale + scale;
 					int py = t.p.y * scale + scale;
 					int qx = t.q.x * scale + scale;
@@ -882,20 +898,20 @@ public class UIWindow extends JFrame
 				}
 			}
 
-			for (WallConnection wc : floorPlan.wallConnections())
-			{
-				if (wc instanceof DoorConnection)
-				{
-					DoorConnection dw = (DoorConnection) wc;
-					Line dl = dw.doorPlacement();
-
-					g.setStroke(new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
-					g.setColor(Color.BLACK);
-					g.drawLine(dl.p.x * scale + scale, dl.p.y * scale + scale, dl.q.x * scale + scale, dl.q.y * scale
-							+ scale);
-					g.setStroke(new BasicStroke(1));
-				}
-			}
+//			for (WallConnection wc : floorPlan.wallConnections())
+//			{
+//				if (wc instanceof DoorConnection)
+//				{
+//					DoorConnection dw = (DoorConnection) wc;
+//					Line dl = dw.doorPlacement();
+//
+//					g.setStroke(new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+//					g.setColor(Color.BLACK);
+//					g.drawLine(dl.p.x * scale + scale, dl.p.y * scale + scale, dl.q.x * scale + scale, dl.q.y * scale
+//							+ scale);
+//					g.setStroke(new BasicStroke(1));
+//				}
+//			}
 
 			if (uShowPossibleConnectionsForSelectedRoom)
 			{

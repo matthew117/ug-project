@@ -1,5 +1,7 @@
 package uk.ac.dur.matthew.bates.ugproject.model;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Defines a rectangle using an origin point, a width and a height
  * 
@@ -59,6 +61,14 @@ public class Rect
 	public boolean contains(int x, int y)
 	{
 		return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
+	}
+	
+	public boolean intersects(Rect r)
+	{
+		Rectangle2D a = new Rectangle2D.Double(x, y, width, height);
+		Rectangle2D b = new Rectangle2D.Double(r.x, r.y, r.width, r.height);
+		
+		return a.intersects(b);
 	}
 
 	public Point midpoint()
