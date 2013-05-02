@@ -596,6 +596,22 @@ public class FloorPlan
 		}
 		return false;
 	}
+	
+	public boolean isPerpendicularToDoorTessellation(Tessellation t, int roomID)
+	{
+		for (Tessellation s : tessellationsByRoomID(roomID))
+		{
+			if (s.type() == Tessellation.Type.DOOR)
+			{
+				if ((s.isHorizontal() && t.isVertical()) || (s.isVertical() && t.isHorizontal()))
+				{
+					if (Line.overlap(t, s) != null) return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	public boolean isDoorTessellation(Line x)
 	{

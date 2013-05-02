@@ -3,7 +3,6 @@ package uk.ac.dur.matthew.bates.ugproject.hpl2.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.dur.matthew.bates.ugproject.hpl2.Entity;
 import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 
 public class PathConfig

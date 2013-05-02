@@ -31,6 +31,15 @@ public class Light extends Primitive
 	private boolean shadowsAffectDynamic = true;
 	private boolean shadowsAffectStatic = true;
 	private float[] size = new float[] { 1, 1, 1 };
+	private String spotFalloffMap = "/Applications/Amnesia.app/Contents/Resources/lights/light_falloff_short_fade.tga";
+	private float aspect = 0.50f;
+	private float fov = 1.30f;
+	
+	public static final String BOX_LIGHT = "BoxLight";
+	public static final String POINT_LIGHT = "PointLight";
+	public static final String SPOT_LIGHT = "SpotLight";
+	
+	private String lightType = BOX_LIGHT;
 
 	public boolean isActive()
 	{
@@ -325,17 +334,57 @@ public class Light extends Primitive
 	public String toString()
 	{
 		return String
-				.format("<BoxLight Active=\"%s\" BlendFunc=\"%d\" CastShadows=\"%s\" DiffuseColor=\"%f %f %f %f\" FalloffMap=\"%s\" FlickerActive=\"%s\" FlickerFade=\"%s\" FlickerOffColor=\"%f %f %f %f\" FlickerOffFadeMaxLength=\"%f\" FlickerOffFadeMinLength=\"%f\" FlickerOffMaxLength=\"%f\" FlickerOffMinLength=\"%f\" FlickerOffPS=\"%s\" FlickerOffRadius=\"%f\" FlickerOffSound=\"%s\" FlickerOnFadeMaxLength=\"%f\" FlickerOnFadeMinLength=\"%f\" FlickerOnMaxLength=\"%f\" FlickerOnMinLength=\"%f\" FlickerOnPS=\"%s\" FlickerOnSound=\"%s\" Gobo=\"%s\" GoboAnimFrameTime=\"%f\" GoboAnimMode=\"%s\" Group=\"%d\" ID=\"%d\" Name=\"%s\" Radius=\"%f\" Rotation=\"%f %f %f\" Scale=\"%f %f %f\" ShadowResolution=\"%s\" ShadowsAffectDynamic=\"%s\" ShadowsAffectStatic=\"%s\" Size=\"%f %f %f\" Tag=\"%s\" WorldPos=\"%f %f %f\" />",
-						active, blendFunc, castShadows, diffuseColor[0], diffuseColor[1], diffuseColor[2],
+				.format("<%s Active=\"%s\" BlendFunc=\"%d\" CastShadows=\"%s\" DiffuseColor=\"%f %f %f %f\" FalloffMap=\"%s\" FlickerActive=\"%s\" FlickerFade=\"%s\" FlickerOffColor=\"%f %f %f %f\" FlickerOffFadeMaxLength=\"%f\" FlickerOffFadeMinLength=\"%f\" FlickerOffMaxLength=\"%f\" FlickerOffMinLength=\"%f\" FlickerOffPS=\"%s\" FlickerOffRadius=\"%f\" FlickerOffSound=\"%s\" FlickerOnFadeMaxLength=\"%f\" FlickerOnFadeMinLength=\"%f\" FlickerOnMaxLength=\"%f\" FlickerOnMinLength=\"%f\" FlickerOnPS=\"%s\" FlickerOnSound=\"%s\" Gobo=\"%s\" GoboAnimFrameTime=\"%f\" GoboAnimMode=\"%s\" Group=\"%d\" ID=\"%d\" Name=\"%s\" Radius=\"%f\" Rotation=\"%f %f %f\" Scale=\"%f %f %f\" ShadowResolution=\"%s\" ShadowsAffectDynamic=\"%s\" ShadowsAffectStatic=\"%s\" Size=\"%f %f %f\" Tag=\"%s\" WorldPos=\"%f %f %f\" Aspect=\"%f\" FOV=\"%f\" SpotFalloffMap=\"%s\" />",
+						lightType, active, blendFunc, castShadows, diffuseColor[0], diffuseColor[1], diffuseColor[2],
 						diffuseColor[3], falloffMap, flickerActive, flickerFade, flickerOffColor[0],
 						flickerOffColor[1], flickerOffColor[2], flickerOffColor[3], flickerOffFadeMaxLength,
 						flickerOffFadeMinLength, flickerOffMaxLength, flickerOffFadeMinLength, flickerOffPS,
 						flickerOffRadius, flickerOffSound, flickerOnFadeMaxLength, flickerOnFadeMinLength,
 						flickerOnMaxLength, flickerOnMinLength, flickerOnPS, flickerOnSound, gobo, goboAnimFrameTime,
-						goboAnimMode, getGroup(), getId(), getName(), radius, getRotation()[0], getRotation()[1],
-						getRotation()[2], getScale()[0], getScale()[1], getScale()[2], shadowResolution,
+						goboAnimMode, getGroup(), getId(), getName(), radius, Math.toRadians(getRotation()[0]), Math.toRadians(getRotation()[1]),
+						Math.toRadians(getRotation()[2]), getScale()[0], getScale()[1], getScale()[2], shadowResolution,
 						shadowsAffectDynamic, shadowsAffectStatic, size[0], size[1], size[2], getTag(),
-						getWorldPos()[0], getWorldPos()[1], getWorldPos()[2]);
+						getWorldPos()[0], getWorldPos()[1], getWorldPos()[2], aspect, fov, spotFalloffMap);
+	}
+
+	public String getLightType()
+	{
+		return lightType;
+	}
+
+	public void setLightType(String lightType)
+	{
+		this.lightType = lightType;
+	}
+
+	public String getSpotFalloffMap()
+	{
+		return spotFalloffMap;
+	}
+
+	public void setSpotFalloffMap(String spotFalloffMap)
+	{
+		this.spotFalloffMap = spotFalloffMap;
+	}
+
+	public float getAspect()
+	{
+		return aspect;
+	}
+
+	public void setAspect(float aspect)
+	{
+		this.aspect = aspect;
+	}
+
+	public float getFov()
+	{
+		return fov;
+	}
+
+	public void setFov(float fov)
+	{
+		this.fov = fov;
 	}
 
 }

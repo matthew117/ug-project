@@ -61,8 +61,8 @@ public class UIWindow extends JFrame
 
 	private FloorPlan floorPlan;
 
-	private int uFloorPlanWidth = 34;
-	private int uFloorPlanHeight = 22;
+	private int uFloorPlanWidth = 32;
+	private int uFloorPlanHeight = 24;
 	private List<Double> uDefinedRoomAreas;
 	private boolean uShowMinorGridlines = true;
 	private boolean uShowMajorGridlines = true;
@@ -356,7 +356,16 @@ public class UIWindow extends JFrame
 		}
 		Collections.sort(roomAreas);
 		Collections.reverse(roomAreas);
-		return new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) roomAreas);
+		FloorPlan f = new FloorPlan(uFloorPlanWidth, uFloorPlanHeight, (ArrayList<Double>) roomAreas);
+		if (f.unreachableRooms(0).size() > 0)
+		{
+			System.out.println("Recalculating");
+			return generateFloorPlan();
+		}
+		else
+		{
+			return f;
+		}
 	}
 
 	protected void reloadFloorPlan()
@@ -421,12 +430,13 @@ public class UIWindow extends JFrame
 				@Override
 				public void mouseEntered(MouseEvent e)
 				{
-					requestFocus();
+					
 				}
 
 				@Override
 				public void mouseClicked(MouseEvent e)
 				{
+					requestFocus();
 				}
 			});
 
@@ -1015,6 +1025,24 @@ public class UIWindow extends JFrame
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 				}
 			}
+			
+//			if (mSelectedRoom != null)
+//			{
+//				int n = floorPlan.getIDByRoomBound(mSelectedRoom);
+//				
+//				for (Tessellation t : floorPlan.tessellationsByRoomID(n))
+//				{
+//					if (floorPlan.isPerpendicularToDoorTessellation(t, n))
+//					{
+//					g.setStroke(new BasicStroke(10));
+//					int px = t.p.x * scale + scale;
+//					int py = t.p.y * scale + scale;
+//					int qx = t.q.x * scale + scale;
+//					int qy = t.q.y * scale + scale;
+//					g.drawLine(px,py,qx,qy);
+//					}
+//				}
+//			}
 		}
 
 		public Point scaledMidPoint(Rect r, int scale)

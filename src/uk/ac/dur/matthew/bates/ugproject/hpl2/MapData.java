@@ -24,6 +24,7 @@ public class MapData
 	private List<Entity> entities;
 	private List<Area> areas;
 	private List<Light> lights;
+	private List<ParticleSystem> particles;
 
 	private boolean fogActive = false;
 	private double[] fogColor = { 1, 1, 1, 1 };
@@ -49,6 +50,7 @@ public class MapData
 		entities = new ArrayList<Entity>();
 		areas = new ArrayList<Area>();
 		lights = new ArrayList<Light>();
+		particles = new ArrayList<ParticleSystem>();
 	}
 
 	public int addObject(Primitive obj)
@@ -58,6 +60,14 @@ public class MapData
 		if (obj instanceof Light) { return addLight((Light) obj); }
 		if (obj instanceof Area) { return addArea((Area) obj); }
 		return addPrimitive(obj);
+	}
+	
+	public int addParticleSystem(ParticleSystem ps)
+	{
+		ps.setId(nextID++);
+		ps.setName("PS_" + particles.size());
+		particles.add(ps);
+		return ps.getId();
 	}
 
 	public int addStaticObject(StaticObject obj)
@@ -427,7 +437,7 @@ public class MapData
 			s += "\n        <Decals>";
 			s += "\n        </Decals>";
 		}
-		if (entities.isEmpty() && areas.isEmpty() && lights.isEmpty())
+		if (entities.isEmpty() && areas.isEmpty() && lights.isEmpty() && particles.isEmpty())
 		{
 			s += "\n<Entities />";
 		}
@@ -445,6 +455,10 @@ public class MapData
 			for (Light l : lights)
 			{
 				s += "\n            " + l;
+			}
+			for (ParticleSystem ps : particles)
+			{
+				s += "\n            " + ps;
 			}
 			s += "\n        </Entities>";
 		}
