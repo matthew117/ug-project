@@ -13,9 +13,9 @@ public class OBB extends Bound
 {	
 	public static final float EPSILON = 0.00001f;
 	
-	public float[][] u = new float[3][3];
+	public float[][] rotation = new float[3][3];
 	
-	public float[] e;
+	public float[] extents;
 	
 	public boolean[] validFaces = new boolean[6];
 	
@@ -25,7 +25,7 @@ public class OBB extends Bound
 	{
 		setPosition(c0, c1, c2);
 		setRotation(u0, u1, u2);
-		e = new float[] {e0, e1, e2};	
+		extents = new float[] {e0, e1, e2};	
 		Arrays.fill(validFaces, true);
 	}
 	
@@ -33,7 +33,7 @@ public class OBB extends Bound
 	{
 		setPosition(x, y, z);
 		setRotation(rx, ry, rz);
-		e = new float[] {halfWidth, halfHeight, halfDepth};	
+		extents = new float[] {halfWidth, halfHeight, halfDepth};	
 		this.validFaces = validFaces;
 	}
 	
@@ -41,7 +41,7 @@ public class OBB extends Bound
 	{
 		setPosition(c);
 		setRotation(u[0], u[1], u[2]);
-		this.e = e;
+		this.extents = e;
 		validFaces = v;
 	}
 	
@@ -55,9 +55,9 @@ public class OBB extends Bound
 		return false;
 	}
 	
-	public void setRotation(float x, float y, float z) { u = getRotationMatrix(x, y, z); }
+	public void setRotation(float x, float y, float z) { rotation = getRotationMatrix(x, y, z); }
 	
-	public float getHeight() { return e[1] * 2; }
+	public float getHeight() { return extents[1] * 2; }
 	
 	@Override
 	public float[] getFaceVector(float[] p)
@@ -68,13 +68,13 @@ public class OBB extends Bound
 		
 		float[] q = subtract(closest, c);
 		
-		float xScale = dot(q, u[0]) / e[0];
-		float yScale = dot(q, u[1]) / e[1];
-		float zScale = dot(q, u[2]) / e[2];
+		float xScale = dot(q, rotation[0]) / extents[0];
+		float yScale = dot(q, rotation[1]) / extents[1];
+		float zScale = dot(q, rotation[2]) / extents[2];
 		
 		if(abs(yScale) >= abs(xScale) && abs(yScale) >= abs(zScale))
 		{
-			if(yScale < 0 && p[1] < c[1] - e[1]) return normals[2];
+			if(yScale < 0 && p[1] < c[1] - extents[1]) return normals[2];
 			else if(yScale > 0) return normals[3];
 		}
 		if(abs(xScale) > abs(zScale))
@@ -84,14 +84,14 @@ public class OBB extends Bound
 		}
 		if(abs(xScale) == abs(zScale))
 		{
-			if(e[0] < e[2])
+			if(extents[0] < extents[2])
 			{
 				if(xScale < 0) return normals[0];
 				else return normals[1];
 			}
-			else if(e[0] == e[2])
+			else if(extents[0] == extents[2])
 			{
-				if(dot(q, u[0]) < dot(q, u[2]))
+				if(dot(q, rotation[0]) < dot(q, rotation[2]))
 				{
 					if(xScale < 0) return normals[0];
 					else return normals[1];
@@ -128,17 +128,17 @@ public class OBB extends Bound
 		for(int i = 0; i < 3; i++)
 			for(int j = 0; j < 3; j++)
 			{
-				R[j][i] = dot(b.u[i], a.u[j]);
+				R[j][i] = dot(b.rotation[i], a.rotation[j]);
 				AbsR[j][i] = abs(R[j][i]) + EPSILON;
 			}
 		
 		float[] t = subtract(a.c, b.c);
-		t = new float[] {dot(t, b.u[0]), dot(t, b.u[1]), dot(t, b.u[2])};		
+		t = new float[] {dot(t, b.rotation[0]), dot(t, b.rotation[1]), dot(t, b.rotation[2])};		
 		
 		for(int i = 0; i < 3; i++)
 		{
-			ra = b.e[i];
-			rb = a.e[0] * AbsR[i][0] + a.e[1] * AbsR[i][1] + a.e[2] * AbsR[i][2];
+			ra = b.extents[i];
+			rb = a.extents[0] * AbsR[i][0] + a.extents[1] * AbsR[i][1] + a.extents[2] * AbsR[i][2];
 			r  = abs(t[i]);
 
 			if(p > abs(rb - (r - ra))) p = abs(rb - (r - ra));
@@ -146,8 +146,8 @@ public class OBB extends Bound
 
 		for(int i = 0; i < 3; i++)
 		{
-			ra = b.e[0] * AbsR[0][i] + b.e[1] * AbsR[1][i] + b.e[2] * AbsR[2][i];
-			rb = a.e[i];
+			ra = b.extents[0] * AbsR[0][i] + b.extents[1] * AbsR[1][i] + b.extents[2] * AbsR[2][i];
+			rb = a.extents[i];
 			r  = abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]);
 
 			if(p > abs(rb - (r - ra))) p = abs(rb - (r - ra));
@@ -170,7 +170,7 @@ public class OBB extends Bound
 	@Override
 	public float getMaximumExtent()
 	{
-		return (float) sqrt(dot(e, e));
+		return (float) sqrt(dot(extents, extents));
 	}
 	
 	/**
@@ -185,9 +185,9 @@ public class OBB extends Bound
 	{ 	
 		float[][] vertices = new float[8][3];
 		
-		float[] eu0 = multiply(u[0], e[0]);
-		float[] eu1 = multiply(u[1], e[1]);
-		float[] eu2 = multiply(u[2], e[2]);
+		float[] eu0 = multiply(rotation[0], extents[0]);
+		float[] eu1 = multiply(rotation[1], extents[1]);
+		float[] eu2 = multiply(rotation[2], extents[2]);
 		
 		vertices[0] = subtract(subtract(subtract(c, eu0), eu1), eu2); //right bottom front 
 		vertices[1] =      add(subtract(subtract(c, eu0), eu1), eu2); //left  bottom front
@@ -209,8 +209,8 @@ public class OBB extends Bound
 		for(int i = 1; i <= 100; i++)
 			for(int j = 1; j <= 100; j++)
 			{
-				float[] x = multiply(u[0], e[0] * ((float) i / 100));
-				float[] z = multiply(u[2], e[2] * ((float) j / 100));
+				float[] x = multiply(rotation[0], extents[0] * ((float) i / 100));
+				float[] z = multiply(rotation[2], extents[2] * ((float) j / 100));
 				
 				vertices.add(add(add(c, x), z));
 				vertices.add(add(subtract(c, x), z));
@@ -233,61 +233,61 @@ public class OBB extends Bound
 		for(int i = 0; i < 3; i++)
 			for(int j = 0; j < 3; j++)
 			{
-				R[j][i] = dot(b.u[i], a.u[j]);
+				R[j][i] = dot(b.rotation[i], a.rotation[j]);
 				AbsR[j][i] = abs(R[j][i]) + EPSILON;
 			}
 		
 		float[] t = subtract(a.c, b.c);
-		t = new float[] {dot(t, b.u[0]), dot(t, b.u[1]), dot(t, b.u[2])};		
+		t = new float[] {dot(t, b.rotation[0]), dot(t, b.rotation[1]), dot(t, b.rotation[2])};		
 		
 		for(int i = 0; i < 3; i++)
 		{
-			ra = b.e[i];
-			rb = a.e[0] * AbsR[i][0] + a.e[1] * AbsR[i][1] + a.e[2] * AbsR[i][2];
+			ra = b.extents[i];
+			rb = a.extents[0] * AbsR[i][0] + a.extents[1] * AbsR[i][1] + a.extents[2] * AbsR[i][2];
 			if(abs(t[i]) > ra + rb) return false;
 		}
 		
 		for(int i = 0; i < 3; i++)
 		{
-			ra = b.e[0] * AbsR[0][i] + b.e[1] * AbsR[1][i] + b.e[2] * AbsR[2][i];
-			rb = a.e[i];
+			ra = b.extents[0] * AbsR[0][i] + b.extents[1] * AbsR[1][i] + b.extents[2] * AbsR[2][i];
+			rb = a.extents[i];
 			if(abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]) > ra + rb) return false;
 		}
 		
-		ra = b.e[1] * AbsR[2][0] + b.e[2] * AbsR[1][0];
-		rb = a.e[1] * AbsR[0][2] + a.e[2] * AbsR[0][1];
+		ra = b.extents[1] * AbsR[2][0] + b.extents[2] * AbsR[1][0];
+		rb = a.extents[1] * AbsR[0][2] + a.extents[2] * AbsR[0][1];
 		if(abs(t[2] * R[1][0] - t[1] * R[2][0]) > ra + rb) return false;
 		
-		ra = b.e[1] * AbsR[2][1] + b.e[2] * AbsR[1][1];
-		rb = a.e[0] * AbsR[0][2] + a.e[2] * AbsR[0][0];
+		ra = b.extents[1] * AbsR[2][1] + b.extents[2] * AbsR[1][1];
+		rb = a.extents[0] * AbsR[0][2] + a.extents[2] * AbsR[0][0];
 		if(abs(t[2] * R[1][1] - t[1] * R[2][1]) > ra + rb) return false;
 		
-		ra = b.e[1] * AbsR[2][2] + b.e[2] * AbsR[1][2];
-		rb = a.e[0] * AbsR[0][1] + a.e[1] * AbsR[0][0];
+		ra = b.extents[1] * AbsR[2][2] + b.extents[2] * AbsR[1][2];
+		rb = a.extents[0] * AbsR[0][1] + a.extents[1] * AbsR[0][0];
 		if(abs(t[2] * R[1][2] - t[1] * R[2][2]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[2][0] + b.e[2] * AbsR[0][0];
-		rb = a.e[1] * AbsR[1][2] + a.e[2] * AbsR[1][1];
+		ra = b.extents[0] * AbsR[2][0] + b.extents[2] * AbsR[0][0];
+		rb = a.extents[1] * AbsR[1][2] + a.extents[2] * AbsR[1][1];
 		if(abs(t[0] * R[2][0] - t[2] * R[0][0]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[2][1] + b.e[2] * AbsR[0][1];
-		rb = a.e[0] * AbsR[1][2] + a.e[2] * AbsR[1][0];
+		ra = b.extents[0] * AbsR[2][1] + b.extents[2] * AbsR[0][1];
+		rb = a.extents[0] * AbsR[1][2] + a.extents[2] * AbsR[1][0];
 		if(abs(t[0] * R[2][1] - t[2] * R[0][1]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[2][2] + b.e[2] * AbsR[0][2];
-		rb = a.e[0] * AbsR[1][1] + a.e[1] * AbsR[1][0];
+		ra = b.extents[0] * AbsR[2][2] + b.extents[2] * AbsR[0][2];
+		rb = a.extents[0] * AbsR[1][1] + a.extents[1] * AbsR[1][0];
 		if(abs(t[0] * R[2][2] - t[2] * R[0][2]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[1][0] + b.e[1] * AbsR[0][0];
-		rb = a.e[1] * AbsR[2][2] + a.e[2] * AbsR[2][1];
+		ra = b.extents[0] * AbsR[1][0] + b.extents[1] * AbsR[0][0];
+		rb = a.extents[1] * AbsR[2][2] + a.extents[2] * AbsR[2][1];
 		if(abs(t[1] * R[0][0] - t[0] * R[1][0]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[1][1] + b.e[1] * AbsR[0][1];
-		rb = a.e[0] * AbsR[2][2] + a.e[2] * AbsR[2][0];
+		ra = b.extents[0] * AbsR[1][1] + b.extents[1] * AbsR[0][1];
+		rb = a.extents[0] * AbsR[2][2] + a.extents[2] * AbsR[2][0];
 		if(abs(t[1] * R[0][1] - t[0] * R[1][1]) > ra + rb) return false;
 		
-		ra = b.e[0] * AbsR[1][2] + b.e[1] * AbsR[0][2];
-		rb = a.e[0] * AbsR[2][1] + a.e[1] * AbsR[2][0];
+		ra = b.extents[0] * AbsR[1][2] + b.extents[1] * AbsR[0][2];
+		rb = a.extents[0] * AbsR[2][1] + a.extents[1] * AbsR[2][0];
 		if(abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return false;
 		
 		return true;
@@ -307,26 +307,26 @@ public class OBB extends Bound
 	{
 		float[] v = subtract(p0, c);
 		
-		p0 = new float[] {dot(v, u[0]), dot(v, u[1]), dot(v, u[2])};
+		p0 = new float[] {dot(v, rotation[0]), dot(v, rotation[1]), dot(v, rotation[2])};
 		
-		float[] min = subtract(c, e);
-		float[] max = add(c, e);
+		float[] min = subtract(c, extents);
+		float[] max = add(c, extents);
 		
 		float[] d = subtract(p1, p0);
 		float[] m = subtract(subtract(add(p0, p1), min), max);
 		
 		float adx = abs(d[0]);
-		if(abs(m[0]) > e[0] + adx) return false;
+		if(abs(m[0]) > extents[0] + adx) return false;
 		float ady = abs(d[1]);
-		if(abs(m[1]) > e[1] + ady) return false;
+		if(abs(m[1]) > extents[1] + ady) return false;
 		float adz = abs(d[2]);
-		if(abs(m[2]) > e[2] + adz) return false;
+		if(abs(m[2]) > extents[2] + adz) return false;
 		
 		adx += EPSILON; ady += EPSILON; adz += EPSILON;
 		
-		if(abs(m[1] * d[2] - m[2] * d[1]) > e[1] * adz + e[2] * ady) return false;
-		if(abs(m[2] * d[0] - m[0] * d[2]) > e[0] * adz + e[2] * adx) return false;
-		if(abs(m[0] * d[1] - m[1] * d[0]) > e[0] * ady + e[1] * adx) return false;
+		if(abs(m[1] * d[2] - m[2] * d[1]) > extents[1] * adz + extents[2] * ady) return false;
+		if(abs(m[2] * d[0] - m[0] * d[2]) > extents[0] * adz + extents[2] * adx) return false;
+		if(abs(m[0] * d[1] - m[1] * d[0]) > extents[0] * ady + extents[1] * adx) return false;
 		
 		return true;	
 	}
@@ -339,12 +339,12 @@ public class OBB extends Bound
 		
 		for(int i = 0; i < 3; i++)
 		{
-			float dist = dot(d, u[i]);
+			float dist = dot(d, rotation[i]);
 			
-			if(dist >  e[i]) dist =  e[i];
-			if(dist < -e[i]) dist = -e[i];
+			if(dist >  extents[i]) dist =  extents[i];
+			if(dist < -extents[i]) dist = -extents[i];
 			
-			q = add(q, multiply(u[i], dist));
+			q = add(q, multiply(rotation[i], dist));
 		}
 		
 		return q;
@@ -362,12 +362,12 @@ public class OBB extends Bound
 
 		for(int i = 0; i < 3; i++)
 		{
-			float dist = dot(d, u[i]);
+			float dist = dot(d, rotation[i]);
 			
-			if(dist >  e[i] || (i * 2) + 1 == n) dist =  e[i];
-			if(dist < -e[i] || (i * 2)     == n) dist = -e[i];
+			if(dist >  extents[i] || (i * 2) + 1 == n) dist =  extents[i];
+			if(dist < -extents[i] || (i * 2)     == n) dist = -extents[i];
 			
-			q = add(q, multiply(u[i], dist));
+			q = add(q, multiply(rotation[i], dist));
 		}
 		
 		return q;
@@ -387,12 +387,12 @@ public class OBB extends Bound
 	{
 		return new float[][]
 			{
-				subtract(c, multiply(u[0],  scale)), //0 front
-					 add(c, multiply(u[0],  scale)), //1 back
-				subtract(c, multiply(u[1],  scale)), //2 down
-					 add(c, multiply(u[1],  scale)), //3 up	 
-				subtract(c, multiply(u[2],  scale)), //4 right 
-					 add(c, multiply(u[2],  scale)), //5 left	
+				subtract(c, multiply(rotation[0],  scale)), //0 front
+					 add(c, multiply(rotation[0],  scale)), //1 back
+				subtract(c, multiply(rotation[1],  scale)), //2 down
+					 add(c, multiply(rotation[1],  scale)), //3 up	 
+				subtract(c, multiply(rotation[2],  scale)), //4 right 
+					 add(c, multiply(rotation[2],  scale)), //5 left	
 			};
 	}
 	
@@ -409,9 +409,9 @@ public class OBB extends Bound
 		return p;
 	}
 	
-	public float[] getUpVector(float scale) { return add(c, multiply(u[1], scale)); }
+	public float[] getUpVector(float scale) { return add(c, multiply(rotation[1], scale)); }
 	
-	public float[] getDownVector(float scale) { return subtract(c, multiply(u[1], scale)); }
+	public float[] getDownVector(float scale) { return subtract(c, multiply(rotation[1], scale)); }
 	
 	public float[] randomPointInside()
 	{
@@ -421,9 +421,9 @@ public class OBB extends Bound
 		float y = (random.nextBoolean()) ? random.nextFloat() : -random.nextFloat();
 		float z = (random.nextBoolean()) ? random.nextFloat() : -random.nextFloat();
 	
-		float[] _x = multiply(u[0], e[0] * x);
-		float[] _y = multiply(u[1], e[1] * y);
-		float[] _z = multiply(u[2], e[2] * z);
+		float[] _x = multiply(rotation[0], extents[0] * x);
+		float[] _y = multiply(rotation[1], extents[1] * y);
+		float[] _z = multiply(rotation[2], extents[2] * z);
 		
 		return add(add(add(c, _x), _y), _z);
 	}

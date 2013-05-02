@@ -1,6 +1,10 @@
 package uk.ac.dur.matthew.bates.ugproject.hpl2.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.dur.matthew.bates.ugproject.hpl2.Entity;
+import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 
 public class PathConfig
 {
@@ -216,11 +220,102 @@ public class PathConfig
 	
 	// @formatter:on
 	
-	public static void main(String[] args)
+	public static List<String> getObjectListByRoomType(RoomType r)
 	{
-		Entity so = new Entity(TOILET);
-		System.out.println(so.getWidth());
-		System.out.println(so.getHeight());
-		System.out.println(so.getDepth());
+		List<String> xs = new ArrayList<String>();
+		
+		switch (r)
+		{
+		case BATHROOM:
+			xs.add(BATHTUB);
+			xs.add(HANDWASH_BASIN);
+			xs.add(TOILET);
+			xs.add(TOILET_PAPER);
+			break;
+		case BEDROOM:
+			xs.add(BED_NICE);
+			xs.add(CABINET_NICE);
+			xs.add(CHEST_OF_DRAWERS_NICE);
+			xs.add(STOVE_SMALL_METAL);
+			break;
+		case CORRIDOR:
+			xs.add(PAINTING01);
+			xs.add(PAINTING02);
+			xs.add(PAINTING03);
+			xs.add(PAINTING04);
+			break;
+		case DINING_ROOM:
+			xs.add(DINING_TABLE);
+			xs.add(PLATE);
+			xs.add(DINING_TABLE);
+			xs.add(CHAIR_NICE01);
+			xs.add(CHAIR_NICE02);
+			xs.add(CHAIR_WOOD);
+			xs.add(CHAIR_WOOD02);
+			break;
+		case FOYER:
+			xs.add(RADIATOR);
+			break;
+		case GUEST_ROOM:
+			xs.add(BED_SIMPLE);
+			xs.add(CHEST_OF_DRAWER_SIMPLE);
+			break;
+		case KITCHEN:
+			xs.add(KITCHEN_SINK);
+			xs.add(FRIDGE);
+			xs.add(FRYING_PAN);
+			xs.add(SHELVES);
+			break;
+		case LAUNDRY:
+			xs.add(BARREL);
+			break;
+		case LIVING_ROOM:
+			xs.add(SOFA);
+			xs.add(CHEST_OF_DRAWERS_NICE);
+			xs.add(TELEVISION);
+			xs.add(ARMCHAIR);
+			xs.add(PIANO);
+			xs.add(PHONOGRAPH);
+			xs.add(STOOL_WOODEN);
+			xs.add(STOVE_FRONT01);
+			break;
+		case MASTER_BEDROOM:
+			xs.add(BED_NICE);
+			xs.add(CABINET_NICE);
+			xs.add(CHEST_OF_DRAWERS_NICE);
+			xs.add(STOVE_SMALL_METAL);
+			break;
+		case STORAGE:
+			xs.add(BARREL);
+			xs.add(BUCKET);
+			xs.add(CRATE);
+			xs.add(CHEST);
+			xs.add(TREASURE_CHEST);
+			xs.add(BROOM);
+			xs.add(SHOVEL);
+			xs.add(BUCKET);
+			xs.add(BADMINTOM_RACKET);
+			break;
+		case STUDY:
+			xs.add(OFFICE_CHAIR);
+			xs.add(DESK_LAMP);
+			xs.add(COMPUTER);
+			xs.add(TYPEWRITER);
+			xs.add(INK_BOTTLE);
+			xs.add(FEATHER_QUILL);
+			xs.add(PAPER_PILE01);
+			xs.add(WORK_DESK);
+			xs.add(WORK_DESK_DOOR);
+			xs.add(LETTER);
+			break;
+		case TOILET:
+			xs.add(TOILET);
+			break;
+		default:
+			break;
+		
+		}
+		
+		return xs;
 	}
 }

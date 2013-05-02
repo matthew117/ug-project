@@ -20,7 +20,7 @@ import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig;
 public class Entity extends StaticObject
 {
 	private boolean active = true;
-	private boolean staticPhysics = true;
+	private boolean staticPhysics = false;
 	private boolean isAffectedByDecal = false;
 	private String callbackFunc;
 	private List<Entity> connectedProps;

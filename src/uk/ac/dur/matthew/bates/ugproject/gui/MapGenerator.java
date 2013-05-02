@@ -1,24 +1,32 @@
 package uk.ac.dur.matthew.bates.ugproject.gui;
 
+import static uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig.*;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import bates.jamie.graphics.collision.OBB;
+import bates.jamie.graphics.util.Matrix;
 
 import uk.ac.dur.matthew.bates.ugproject.hpl2.Area;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.Door;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.EditorSession;
+import uk.ac.dur.matthew.bates.ugproject.hpl2.Entity;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.HPL2Map;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.Light;
+import uk.ac.dur.matthew.bates.ugproject.hpl2.MapData;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.ObjectFactory;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.Plane;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.StaticObject;
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PathConfig;
-import uk.ac.dur.matthew.bates.ugproject.hpl2.util.PrettyPrinter;
 import uk.ac.dur.matthew.bates.ugproject.model.DoorConnection;
 import uk.ac.dur.matthew.bates.ugproject.model.FloorPlan;
 import uk.ac.dur.matthew.bates.ugproject.model.Room;
 import uk.ac.dur.matthew.bates.ugproject.model.Room.RoomType;
 import uk.ac.dur.matthew.bates.ugproject.model.Tessellation;
 import uk.ac.dur.matthew.bates.ugproject.model.Wall;
+import uk.ac.dur.matthew.bates.ugproject.util.ListUtils;
 import uk.ac.dur.matthew.bates.ugproject.util.RandomUtils;
 
 public class MapGenerator
@@ -41,6 +49,214 @@ public class MapGenerator
 		generateFloors();
 		generateWalls();
 		placeDoors();
+		furnishRooms();
+		getBoundingBoxes();
+	}
+
+	private void furnishRooms()
+	{
+		for (Room r : fp.rooms())
+		{
+			furnishRoom(r);
+		}
+	}
+
+	private void furnishRoom(Room r)
+	{
+		int x = r.x;
+		int y = r.y;
+		int width = r.width;
+		int height = r.height;
+
+		float mx = (float) (x + width / 2.0);
+		float my = (float) (y + height / 2.0);
+
+		RoomType type = r.type();
+		List<String> possibleObjects = PathConfig.getObjectListByRoomType(type);
+
+		MapData map = this.map.getMapData();
+		ObjectFactory o = new ObjectFactory("");
+
+		switch (type)
+		{
+		case BATHROOM:
+			furnishBathroom(r, map);
+			break;
+		case BEDROOM:
+			furnishBedroom(r, map);
+			break;
+		case CORRIDOR:
+			break;
+		case DINING_ROOM:
+			map.addObject(o.file(TABLE_NICE_WOOD).position(mx, 0, my).scale(1.3f, 1.0f, 1.3f).build());
+
+			o.scale(1, 1, 1);
+			o.file(RandomUtils.getRandomBoolean() ? CHAIR_NICE01 : CHAIR_NICE02);
+
+			map.addObject(o.position(mx - 0.5f, 0, my - 0.5f).rotation(0, 0, 0).build());
+			map.addObject(o.position(mx + 0.5f, 0, my - 0.5f).rotation(0, 0, 0).build());
+			map.addObject(o.position(mx - 1.25f, 0, my).rotation(0, 90, 0).build());
+			map.addObject(o.position(mx - 0.5f, 0, my + 0.5f).rotation(0, 180, 0).build());
+			map.addObject(o.position(mx + 0.5f, 0, my + 0.5f).rotation(0, 180, 0).build());
+			map.addObject(o.position(mx + 1.25f, 0, my).rotation(0, -90, 0).build());
+
+			map.addObject(o.file(PLATE).position(mx - 0.5f, 1, my - 0.4f).build());
+			map.addObject(o.file(PLATE).position(mx + 0.5f, 1, my - 0.4f).build());
+			map.addObject(o.file(PLATE).position(mx - 1.05f, 1, my).build());
+			map.addObject(o.file(PLATE).position(mx - 0.5f, 1, my + 0.4f).build());
+			map.addObject(o.file(PLATE).position(mx + 0.5f, 1, my + 0.4f).build());
+			map.addObject(o.file(PLATE).position(mx + 1.05f, 1, my).build());
+
+			break;
+		case FOYER:
+			break;
+		case GUEST_ROOM:
+			break;
+		case KITCHEN:
+			break;
+		case LAUNDRY:
+			break;
+		case LIVING_ROOM:
+			break;
+		case MASTER_BEDROOM:
+			break;
+		case STORAGE:
+			break;
+		case STUDY:
+			break;
+		case TOILET:
+			furnishToilet(r, map);
+			break;
+		default:
+			break;
+
+		}
+	}
+
+	protected void furnishToilet(Room r, MapData map)
+	{
+		ObjectFactory o = new ObjectFactory("");
+
+		List<Tessellation> xs = fp.wallTessellationsByRoomID(r.id());
+		Tessellation p = ListUtils.random(xs);
+		xs.remove(p);
+		int px = p.midpoint().x;
+		int py = p.midpoint().y;
+
+		StaticObject s = o.file(TOILET).position(px, 0, py).rotate(0, 0, 0.235f, 0, p.orientation(), 0).build();
+
+		map.addObject(s);
+		map.addObject(o.file(TOILET_PAPER).rotate(-0.4f, 0, 0, 0, 0, 0).build());
+		map.addObject(o.file(TOILET_PAPER).position(s.getX(), 0.932f, s.getZ()).build());
+
+		p = ListUtils.random(xs);
+		px = p.midpoint().x;
+		py = p.midpoint().y;
+
+		map.addObject(o.file(HANDWASH_BASIN).position(px, 0, py).rotation(0, -90, 0)
+				.rotate(0, 0, 0.235f, 0, p.orientation(), 0).build());
+	}
+
+	protected void furnishBathroom(Room r, MapData map)
+	{
+		ObjectFactory o = new ObjectFactory("");
+
+		List<Tessellation> xs = fp.wallTessellationsByRoomID(r.id());
+		Tessellation p = ListUtils.random(xs);
+		xs.remove(p);
+		int px = p.midpoint().x;
+		int py = p.midpoint().y;
+
+		StaticObject s = o.file(TOILET).position(px, 0, py).rotate(0, 0, 0.235f, 0, p.orientation(), 0).build();
+
+		map.addObject(s);
+		map.addObject(o.file(TOILET_PAPER).rotate(-0.4f, 0, 0, 0, 0, 0).build());
+		map.addObject(o.file(TOILET_PAPER).position(s.getX(), 0.932f, s.getZ()).build());
+
+		p = ListUtils.random(xs);
+		xs.remove(p);
+		px = p.midpoint().x;
+		py = p.midpoint().y;
+
+		map.addObject(o.file(HANDWASH_BASIN).position(px, 0, py).rotation(0, -90, 0)
+				.rotate(0, 0, 0.235f, 0, p.orientation(), 0).build());
+
+		for (Tessellation w : xs)
+		{
+			if (w.length() >= 4)
+			{
+				int wx = w.midpoint().x;
+				int wy = w.midpoint().y;
+
+				map.addObject(o.file(BATHTUB).position(wx, 0, wy).rotation(0, 0, 0)
+						.rotate(0, 0, 1.1f, 0, w.orientation(), 0).build());
+				break;
+			}
+		}
+
+	}
+
+	protected void furnishBedroom(Room r, MapData map)
+	{
+		ObjectFactory o = new ObjectFactory("");
+
+		List<Tessellation> xs = fp.tessellationsByRoomID(r.id());
+		for (Iterator<Tessellation> iterator = xs.iterator(); iterator.hasNext();)
+		{
+			Tessellation t = iterator.next();
+			if (t.type() == Tessellation.Type.DOOR || t.type() == Tessellation.Type.ALCOVE)
+			{
+				iterator.remove();
+			}
+		}
+
+		Tessellation p = ListUtils.random(xs);
+		xs.remove(p);
+		int px = p.midpoint().x;
+		int py = p.midpoint().y;
+
+		StaticObject s = o.file(CABINET_NICE).position(px, 0, py).rotate(0, 0, 0.75f, 0, p.orientation(), 0).build();
+
+		map.addObject(s);
+
+		for (Tessellation w : xs)
+		{
+			if (w.length() >= 4)
+			{
+				int wx = w.midpoint().x;
+				int wy = w.midpoint().y;
+
+				map.addObject(o.file(BED_NICE).position(wx, 0, wy).rotation(0, 0, 0)
+						.rotate(0, 0, 2, 0, w.orientation(), 0).build());
+				break;
+			}
+		}
+
+	}
+
+	private boolean collides(List<StaticObject> xs, StaticObject x)
+	{
+		for (StaticObject s : xs)
+		{
+			if (collides(x, s)) return true;
+		}
+		return false;
+	}
+
+	private boolean collides(StaticObject a, StaticObject b)
+	{
+		OBB aOBB = a.getOBB();
+		OBB bOBB = b.getOBB();
+
+		return aOBB.testOBB(bOBB);
+	}
+
+	private void addObjects(List<StaticObject> xs)
+	{
+		for (StaticObject o : xs)
+		{
+			this.map.getMapData().addObject(o);
+		}
 	}
 
 	private void placeDoors()
@@ -67,16 +283,16 @@ public class MapGenerator
 			StaticObject a = new StaticObject(getDoorWayModelByType(d.frontFacing().parent().type(), d.frontFacing()));
 			if (d.frontFacing().orientation() == Wall.NORTH) a.setWorldPos(new float[] { x, 0, y - WALL_PADDING });
 			if (d.frontFacing().orientation() == Wall.SOUTH) a.setWorldPos(new float[] { x, 0, y + WALL_PADDING });
-			if (d.frontFacing().orientation() == Wall.EAST) a.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
-			if (d.frontFacing().orientation() == Wall.WEST) a.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			if (d.frontFacing().orientation() == Wall.EAST) a.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			if (d.frontFacing().orientation() == Wall.WEST) a.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
 			a.setRotation(new float[] { 0, front, 0 });
 			this.map.getMapData().addStaticObject(a);
 
 			StaticObject b = new StaticObject(getDoorWayModelByType(d.backFacing().parent().type(), d.frontFacing()));
 			if (d.backFacing().orientation() == Wall.NORTH) b.setWorldPos(new float[] { x, 0, y - WALL_PADDING });
 			if (d.backFacing().orientation() == Wall.SOUTH) b.setWorldPos(new float[] { x, 0, y + WALL_PADDING });
-			if (d.backFacing().orientation() == Wall.EAST) b.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
-			if (d.backFacing().orientation() == Wall.WEST) b.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			if (d.backFacing().orientation() == Wall.EAST) b.setWorldPos(new float[] { x + WALL_PADDING, 0, y });
+			if (d.backFacing().orientation() == Wall.WEST) b.setWorldPos(new float[] { x - WALL_PADDING, 0, y });
 			b.setRotation(new float[] { 0, back, 0 });
 			this.map.getMapData().addStaticObject(b);
 
@@ -111,7 +327,7 @@ public class MapGenerator
 		case KITCHEN:
 			return PathConfig.MANSION_DOORWAY_WHITE;
 		case LAUNDRY:
-			return PathConfig.MANSION_DOORWAY_WHITE;
+			return PathConfig.MANSION_DOORWAY_RED;
 		case LIVING_ROOM:
 			return PathConfig.MANSION_DOORWAY_WHITE;
 		case MASTER_BEDROOM:
@@ -154,6 +370,34 @@ public class MapGenerator
 			plane.setWorldPos(new float[] { r.x, 0, r.y });
 			map.getMapData().addPrimitive(plane);
 		}
+	}
+
+	private void getBoundingBoxes()
+	{
+		List<StaticObject> ys = new ArrayList<StaticObject>();
+		for (Entity e : map.getMapData().getEntities())
+		{
+			OBB obb = e.getOBB();
+
+			float[] position = e.getWorldPos();
+			float[] extents = e.getBounds();
+			float[] rotation = e.getRotation();
+
+			float cx = e.getMinX() + (e.getWidth() / 2.0f)  ;
+			float cy = e.getMinY() - (e.getHeight() / 2.0f) ;
+			float cz = e.getMinZ() + (e.getDepth()/ 2.0f);
+
+			Area bound = new Area();
+			bound.setAreaType(Area.SCRIPT_AREA);
+			bound.setWorldPos(e.getX() - cx, e.getY() - cy, e.getZ() - cz);
+			bound.setRotation(rotation[0], rotation[1], rotation[2]);
+			bound.setScale(extents[0], extents[1], extents[2]);
+
+			map.getMapData().addArea(bound);
+
+		}
+
+		addObjects(ys);
 	}
 
 	private void generateWalls()
@@ -516,7 +760,7 @@ public class MapGenerator
 	private List<StaticObject> generateRandomAlcoveReplacement(Tessellation t)
 	{
 		List<StaticObject> xs = new ArrayList<StaticObject>();
-		
+
 		int x = t.midpoint().x;
 		int y = t.midpoint().y;
 
@@ -526,20 +770,31 @@ public class MapGenerator
 			{
 				if (RandomUtils.getRandomBoolean()) // 1 -> 2
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x -1.5f, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type()) : getWindowModel(t))).position(x +1, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x - 2f, 0, y + WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type())
+							: getWindowModel(t))).position(x + 1, 0, y + WALL_PADDING).rotation(0, t.orientation(), 0)
+							.build());
 				}
-				else // 2 -> 1
+				else
+				// 2 -> 1
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + 1.5f, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type()) : getWindowModel(t))).position(x - 1, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x + 2f, 0, y + WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type())
+							: getWindowModel(t))).position(x - 1, 0, y + WALL_PADDING).rotation(0, t.orientation(), 0)
+							.build());
 				}
 			}
-			else // 3
+			else
+			// 3
 			{
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x -2, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x , 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x +2, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x - 2, 0, y + WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x, 0, y + WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + 2, 0, y + WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
 			}
 		}
 
@@ -549,20 +804,30 @@ public class MapGenerator
 			{
 				if (RandomUtils.getRandomBoolean()) // 1 -> 2
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x -1.5f, 0, y-WALL_PADDING).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type()) : getWindowModel(t))).position(x +1, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x - 2f, 0, y - WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type())
+							: getWindowModel(t))).position(x + 1, 0, y + WALL_PADDING).rotation(0, t.orientation(), 0)
+							.build());
 				}
-				else // 2 -> 1
+				else
+				// 2 -> 1
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + 1.5f, 0, y-WALL_PADDING).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(getWindowModel(t))).position(x - 1, 0, y+WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x + 2f, 0, y - WALL_PADDING).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getWindowModel(t))).position(x - 1, 0, y + WALL_PADDING)
+							.rotation(0, t.orientation(), 0).build());
 				}
 			}
-			else // 3
+			else
+			// 3
 			{
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x -2, 0, y-WALL_PADDING).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x , 0, y-WALL_PADDING).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x +2, 0, y-WALL_PADDING).rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x - 2, 0, y - WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x, 0, y - WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + 2, 0, y - WALL_PADDING)
+						.rotation(0, t.orientation(), 0).build());
 			}
 		}
 		if (t.orientation() == Wall.EAST)
@@ -571,20 +836,29 @@ public class MapGenerator
 			{
 				if (RandomUtils.getRandomBoolean()) // 1 -> 2
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x-WALL_PADDING, 0, y -1.5f).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(getWindowModel(t))).position(x-WALL_PADDING, 0, y +1).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x - WALL_PADDING, 0, y - 2f).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getWindowModel(t))).position(x - WALL_PADDING, 0, y + 1)
+							.rotation(0, t.orientation(), 0).build());
 				}
-				else // 2 -> 1
+				else
+				// 2 -> 1
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x-WALL_PADDING, 0, y + 1.5f).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(getWindowModel(t))).position(x-WALL_PADDING, 0, y - 1).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x - WALL_PADDING, 0, y + 2f).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getWindowModel(t))).position(x - WALL_PADDING, 0, y - 1)
+							.rotation(0, t.orientation(), 0).build());
 				}
 			}
-			else // 3
+			else
+			// 3
 			{
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x-WALL_PADDING, 0, y -2).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x-WALL_PADDING, 0, y).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x-WALL_PADDING, 0, y +2).rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x - WALL_PADDING, 0, y - 2)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x - WALL_PADDING, 0, y)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x - WALL_PADDING, 0, y + 2)
+						.rotation(0, t.orientation(), 0).build());
 			}
 		}
 		if (t.orientation() == Wall.WEST)
@@ -593,23 +867,33 @@ public class MapGenerator
 			{
 				if (RandomUtils.getRandomBoolean()) // 1 -> 2
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x+WALL_PADDING, 0, y -1.5f).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(getWindowModel(t))).position(x+WALL_PADDING, 0, y +1).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x + WALL_PADDING, 0, y - 2f).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getWindowModel(t))).position(x + WALL_PADDING, 0, y + 1)
+							.rotation(0, t.orientation(), 0).build());
 				}
-				else // 2 -> 1
+				else
+				// 2 -> 1
 				{
-					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x+WALL_PADDING, 0, y + 1.5f).rotation(0, t.orientation(), 0).build());
-					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type()) : getWindowModel(t))).position(x+WALL_PADDING, 0, y - 1).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type())))
+							.position(x + WALL_PADDING, 0, y + 2f).rotation(0, t.orientation(), 0).build());
+					xs.add((new ObjectFactory(RandomUtils.getRandomBoolean() ? getHalfWallStatic(t.parent().type())
+							: getWindowModel(t))).position(x + WALL_PADDING, 0, y - 1).rotation(0, t.orientation(), 0)
+							.build());
 				}
 			}
-			else // 3
+			else
+			// 3
 			{
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x+WALL_PADDING, 0, y -2).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x+WALL_PADDING, 0, y).rotation(0, t.orientation(), 0).build());
-				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x+WALL_PADDING, 0, y +2).rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + WALL_PADDING, 0, y - 2)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + WALL_PADDING, 0, y)
+						.rotation(0, t.orientation(), 0).build());
+				xs.add((new ObjectFactory(getHalfWallStatic(t.parent().type()))).position(x + WALL_PADDING, 0, y + 2)
+						.rotation(0, t.orientation(), 0).build());
 			}
 		}
-		
+
 		return xs;
 	}
 
@@ -720,14 +1004,14 @@ public class MapGenerator
 	public void writeToFile(String customStoryFolder)
 	{
 		map.writeToFile(customStoryFolder);
-		try
-		{
-			PrettyPrinter.printDocument(map.toString());
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-		}
+//		try
+//		{
+//			PrettyPrinter.printDocument(map.toString());
+//		}
+//		catch (Exception ex)
+//		{
+//			ex.printStackTrace();
+//		}
 	}
 
 }

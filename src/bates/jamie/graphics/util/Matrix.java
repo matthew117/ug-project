@@ -106,17 +106,17 @@ public class Matrix
 		
 		float[][] Rx =
 			{{    1    ,    0    ,    0    },
-			 {    0    ,  cosf(x), -sinf(x)},
-			 {    0    ,  sinf(x),  cosf(x)}};
+			 {    0    ,  cosf(x), sinf(x)},
+			 {    0    ,  -sinf(x),  cosf(x)}};
 		
 		float[][] Ry =
-			{{  cosf(y),    0    ,  sinf(y)},
+			{{  cosf(y),    0    ,  -sinf(y)},
 			 {    0    ,    1    ,    0    },
-			 { -sinf(y),    0    ,  cosf(y)}};
+			 { sinf(y),    0    ,  cosf(y)}};
 		
 		float[][] Rz =
-			{{  cosf(z), -sinf(z),    0    },
-			 {  sinf(z),  cosf(z),    0    },
+			{{  cosf(z), sinf(z),    0    },
+			 {  -sinf(z),  cosf(z),    0    },
 			 {    0    ,    0    ,    1    }};
 		
 		float[][] R = multiply(multiply(Ry, Rx), Rz);

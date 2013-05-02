@@ -32,6 +32,21 @@ public class ListUtils
 		return sum;
 	}
 	
+	public static float sumFloat(List<Float> xs)
+	{	
+		if (xs == null || xs.isEmpty()) return 0.0f;
+		float sum = 0;
+		for (Float n : xs)
+			sum += n;
+		return sum;
+	}
+	
+	public static float average(List<Float> xs)
+	{
+		float n = xs.size();
+		return sumFloat(xs)/n;
+	}
+	
 	public static int sumInt(List<Integer> xs)
 	{
 		if (xs == null || xs.isEmpty()) return 0;

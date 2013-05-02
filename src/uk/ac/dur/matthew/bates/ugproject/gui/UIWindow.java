@@ -61,8 +61,8 @@ public class UIWindow extends JFrame
 
 	private FloorPlan floorPlan;
 
-	private int uFloorPlanWidth = 28;
-	private int uFloorPlanHeight = 20;
+	private int uFloorPlanWidth = 34;
+	private int uFloorPlanHeight = 22;
 	private List<Double> uDefinedRoomAreas;
 	private boolean uShowMinorGridlines = true;
 	private boolean uShowMajorGridlines = true;
@@ -322,16 +322,15 @@ public class UIWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				// TODO Placeholder
 				System.out.println("TESSELLATION PROBLEMS: " + floorPlan.numberOfTessellationProblems());
 				System.out.println("ROOM SIZE PROBLEMS: " + floorPlan.roomSizeProblemIndex());
 				System.out.println("UNREACHABLE ROOMS: " + floorPlan.unreachableRooms(0));
 				System.out.println("GRAPH DISTANCE: " + floorPlan.connectivityGraphDistance(0));
 				System.out.println("TREE: " + floorPlan.iNodeTreeEdges(0));
-				System.out.println("PRIVACY: " + floorPlan.privacyProblems(0));
-				List<ArrayList<Integer>> xs = new ArrayList<ArrayList<Integer>>();
-				floorPlan.newDFS(xs, null, null, 0, 0);
-				System.out.println("DFS: " + xs);
+//				System.out.println("PRIVACY: " + floorPlan.privacyProblems(0));
+//				List<ArrayList<Integer>> xs = new ArrayList<ArrayList<Integer>>();
+//				floorPlan.newDFS(xs, null, null, 0, 0);
+//				System.out.println("DFS: " + xs);
 				MapGenerator mg = new MapGenerator(floorPlan);
 				mg.writeToFile(PathConfig.AMNESIA_RESOURCES_DIR + "maps/UGProject/maps/map01.map");
 			}
@@ -352,8 +351,8 @@ public class UIWindow extends JFrame
 		int n = r.nextInt(3);
 		for (int i = 1; i <= 9 + n; i++)
 		{
-			if (i > 6) roomAreas.add((double) (r.nextInt(2) + 3));
-			else roomAreas.add((double) (r.nextInt(3) + 3));
+			if (i > 6) roomAreas.add((double) (r.nextInt(4) + 3));
+			else roomAreas.add((double) (r.nextInt(6) + 3));
 		}
 		Collections.sort(roomAreas);
 		Collections.reverse(roomAreas);
@@ -834,13 +833,13 @@ public class UIWindow extends JFrame
 					switch (t.type())
 					{
 					case ALCOVE:
-						g.setColor(Color.MAGENTA); break;
+						g.setColor(Color.ORANGE); break;
 					case STOVE:
-						g.setColor(Color.GREEN); break;
+						g.setColor(Color.BLACK); break;
 					case WALL:
 						g.setColor(Color.BLACK); break;
 					case WINDOW:
-						g.setColor(Color.CYAN); break;
+						g.setColor(Color.BLUE); break;
 					case DOOR:
 						g.setColor(Color.RED); break;
 					default:

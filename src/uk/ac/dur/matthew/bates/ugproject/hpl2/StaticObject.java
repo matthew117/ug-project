@@ -7,7 +7,11 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import bates.jamie.graphics.collision.OBB;
+import bates.jamie.graphics.util.Matrix;
+
 import uk.ac.dur.matthew.bates.ugproject.hpl2.util.ColladaXMLParser;
+import uk.ac.dur.matthew.bates.ugproject.util.ListUtils;
 
 public class StaticObject extends Primitive
 {
@@ -21,12 +25,12 @@ public class StaticObject extends Primitive
 
 	public StaticObject()
 	{
-		
+
 	}
 
 	public StaticObject(StaticObject obj)
 	{
-		super((Primitive)obj);
+		super((Primitive) obj);
 		this.castShadows = obj.castShadows;
 		this.collides = obj.collides;
 		this.fileIndex = obj.fileIndex;
@@ -36,6 +40,53 @@ public class StaticObject extends Primitive
 	public StaticObject(String filePath)
 	{
 		this.filePath = filePath;
+	}
+
+	public float[] getBounds()
+	{
+		return new float[] { getWidth(), getHeight(), getDepth() };
+	}
+
+	public float[] getHalfBounds()
+	{
+		return new float[] { getWidth() / 0.2f, getHeight() / 2.0f, getDepth() / 2.0f };
+	}
+
+	public OBB getOBB()
+	{
+		float[] bound = getHalfBounds();
+		return new OBB(getX(), getY(), getZ(), getRotation()[0], getRotation()[1], getRotation()[2], bound[0],
+				bound[1], bound[2]);
+	}
+
+	public float getMidX()
+	{
+		return getX() + (getMinX() + getMaxX()) / 2.0f;
+	}
+
+	public float getMidY()
+	{
+		return getY() + (getMinY() + getMaxY()) / 2.0f;
+	}
+
+	public float getMidZ()
+	{
+		return getZ() + (getMinZ() + getMaxZ()) / 2.0f;
+	}
+
+	public float getX()
+	{
+		return getWorldPos()[0];
+	}
+
+	public float getY()
+	{
+		return getWorldPos()[1];
+	}
+
+	public float getZ()
+	{
+		return getWorldPos()[2];
 	}
 
 	public float getMaxX()
@@ -49,6 +100,10 @@ public class StaticObject extends Primitive
 				currentMax = xs[0];
 			}
 		}
+
+		float[] xyz = Matrix.multiply(new float[] { currentMax, 0, 0 },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMax;
 	}
 
@@ -82,6 +137,9 @@ public class StaticObject extends Primitive
 				currentMin = xs[0];
 			}
 		}
+		float[] xyz = Matrix.multiply(new float[] { currentMin, 0, 0 },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMin;
 	}
 
@@ -96,6 +154,9 @@ public class StaticObject extends Primitive
 				currentMax = xs[1];
 			}
 		}
+		float[] xyz = Matrix.multiply(new float[] { 0, currentMax, 0 },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMax;
 	}
 
@@ -110,6 +171,9 @@ public class StaticObject extends Primitive
 				currentMin = xs[1];
 			}
 		}
+		float[] xyz = Matrix.multiply(new float[] { 0, currentMin, 0 },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMin;
 	}
 
@@ -124,6 +188,9 @@ public class StaticObject extends Primitive
 				currentMax = xs[2];
 			}
 		}
+		float[] xyz = Matrix.multiply(new float[] { 0, 0, currentMax },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMax;
 	}
 
@@ -138,19 +205,47 @@ public class StaticObject extends Primitive
 				currentMin = xs[2];
 			}
 		}
+		float[] xyz = Matrix.multiply(new float[] { 0, 0, currentMin },
+				Matrix.getRotationMatrix(getRotation()[0], getRotation()[1], getRotation()[2]));
+
 		return currentMin;
 	}
-	
+
+	public float[] getCentroid()
+	{
+		loadVertexList(filePath);
+
+		List<Float> xs = new ArrayList<Float>();
+		for (float[] v : vertexList)
+		{
+			xs.add(v[0]);
+		}
+		
+		List<Float> ys = new ArrayList<Float>();
+		for (float[] v : vertexList)
+		{
+			ys.add(v[1]);
+		}
+		
+		List<Float> zs = new ArrayList<Float>();
+		for (float[] v : vertexList)
+		{
+			zs.add(v[2]);
+		}
+
+		return new float[]{ListUtils.average(xs),ListUtils.average(ys),ListUtils.average(zs)};
+	}
+
 	public float getWidth()
 	{
 		return getMaxX() - getMinX();
 	}
-	
+
 	public float getHeight()
 	{
 		return getMaxY() - getMinY();
 	}
-	
+
 	public float getDepth()
 	{
 		return getMaxZ() - getMinZ();
@@ -186,7 +281,6 @@ public class StaticObject extends Primitive
 		this.fileIndex = fileIndex;
 	}
 
-
 	public String getFilePath()
 	{
 		return filePath;
@@ -206,8 +300,8 @@ public class StaticObject extends Primitive
 		s += "Group=\"" + getGroup() + "\" ";
 		s += "ID=\"" + getId() + "\" ";
 		s += "Name=\"" + (getName() != null ? getName() : "") + "\" ";
-		s += "Rotation=\"" + Math.toRadians(getRotation()[0]) + " " + Math.toRadians(getRotation()[1]) + " " + Math
-				.toRadians(getRotation()[2]) + "\" ";
+		s += "Rotation=\"" + Math.toRadians(getRotation()[0]) + " " + Math.toRadians(getRotation()[1]) + " "
+				+ Math.toRadians(getRotation()[2]) + "\" ";
 		s += "Scale=\"" + getScale()[0] + " " + getScale()[1] + " " + getScale()[2] + "\" ";
 		s += "Tag=\"" + (getTag() != null ? getTag() : "") + "\" ";
 		s += "WorldPos=\"" + getWorldPos()[0] + " " + getWorldPos()[1] + " " + getWorldPos()[2] + "\" />";

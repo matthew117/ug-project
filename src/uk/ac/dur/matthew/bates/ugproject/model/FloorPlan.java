@@ -30,7 +30,21 @@ public class FloorPlan
 
 	public FloorPlan(int width, int height, ArrayList<Double> areas)
 	{
-		this.mAreas = new ArrayList<Double>(areas);
+		this.mAreas = areas;
+		// System.out.println(areas);
+		// List<Double> xs = areas.subList(0, areas.size()/2);
+		// List<Double> zs = Arrays.asList(10.0, 10.0, 5.0);
+		// List<Double> ys = areas.subList(areas.size()/2, areas.size());
+		// mRoomBounds = Squarify.squarify(areas.subList(0, areas.size()/2), new RectF(0, 0,
+		// width/4.0, height));
+		// mRoomBounds.add(new Rect(width/4, 0, width/8, height));
+		// mRoomBounds.add(new Rect(width -(width/4 + width/8), 0, width/8, height));
+		// mRoomBounds.add(new Rect(width/4 + width/8, 0, width/4, height/3));
+		// mRoomBounds.addAll(Squarify.squarify(areas.subList(areas.size()/2 + 1, areas.size()-1),
+		// new RectF(width- (width/4.0), 0, width/4.0, height)));
+		//
+		// mAreas = ListUtils.append(ListUtils.append(xs, zs), ys);
+		// System.out.println(xs + " " + zs + " " + ys);
 		mRoomBounds = Squarify.squarify(areas, new RectF(0, 0, width, height));
 	}
 
@@ -67,11 +81,58 @@ public class FloorPlan
 		if (mRooms != null) return mRooms;
 
 		mRooms = new ArrayList<Room>();
-		for (int i = 0; i < roomTypes().size(); i++)
+		for (int i = 0; i < n(); i++)
 		{
-			mRooms.add(new Room(roomBounds().get(i), i, roomTypes().get(i)));
+			 mRooms.add(new Room(roomBounds().get(i), i, roomTypes().get(i)));
+//			if (i <= (n() - 3) / 2)
+//			{
+//				List<RoomType> xs = new ArrayList<Room.RoomType>();
+//				for (RoomType t : RoomType.values())
+//				{
+//					if (t.isPublic()) xs.add(t);
+//				}
+//				mRooms.add(new Room(roomBounds().get(i), i, ListUtils.random(xs)));
+//			}
+//			else if (i > ((n() - 3) / 2) + 3)
+//			{
+//				List<RoomType> xs = new ArrayList<Room.RoomType>();
+//				for (RoomType t : RoomType.values())
+//				{
+//					if (t.isPrivate()) xs.add(t);
+//				}
+//				mRooms.add(new Room(roomBounds().get(i), i, ListUtils.random(xs)));
+//			}
+//			else
+//			{
+//				if (i == (n() / 2)) mRooms.add(new Room(roomBounds().get(i), i, RoomType.FOYER));
+//				else mRooms.add(new Room(roomBounds().get(i), i, RoomType.CORRIDOR));
+//			}
 		}
 		return mRooms;
+	}
+	
+	public List<Tessellation> tessellationsByRoomID(int roomID)
+	{
+		List<Tessellation> xs = new ArrayList<Tessellation>();
+		
+		for (Tessellation t : tessellation())
+		{
+			if (t.parent().id() == roomID) xs.add(t);
+		}
+		
+		return xs;
+	}
+	
+	public List<Tessellation> wallTessellationsByRoomID(int roomID)
+	{
+		List<Tessellation> xs = new ArrayList<Tessellation>();
+		
+		for (Tessellation t : tessellationsByRoomID(roomID))
+		{
+			if (t.type() == Tessellation.Type.WALL) xs.add(t);
+		}
+		
+		return xs;
 	}
 
 	public List<RoomType> roomTypes()
@@ -499,8 +560,9 @@ public class FloorPlan
 					return i;
 				}
 
-				if ((n - i >= 6) && (r.type() == RoomType.LIVING_ROOM || r.type() == RoomType.MASTER_BEDROOM
-						|| r.type() == RoomType.GUEST_ROOM || r.type() == RoomType.FOYER || r.type() == RoomType.STUDY))
+				if ((n - i >= 6)
+						&& (r.type() == RoomType.LIVING_ROOM || r.type() == RoomType.MASTER_BEDROOM
+								|| r.type() == RoomType.GUEST_ROOM || r.type() == RoomType.FOYER || r.type() == RoomType.STUDY))
 				{
 					temp.add(new Tessellation(a, r, o, Tessellation.Type.ALCOVE));
 					i += 6;

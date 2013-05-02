@@ -4,6 +4,7 @@ public class Area extends Primitive
 {
 	public static final String PATH_NODE = "PathNode";
 	public static final String PLAYER_START = "PlayerStart";
+	public static final String SCRIPT_AREA = "Script";
 
 	private boolean active = true;
 	private String areaType = "";
@@ -51,6 +52,12 @@ public class Area extends Primitive
 		sb.append("   <UserVariables />\n");
 		sb.append("</Area>");
 		return sb.toString();
+	}
+
+	public void setScale(float f, float g, float h)
+	{
+		this.setScale(new float[]{f,g,h});
+		
 	}
 
 }

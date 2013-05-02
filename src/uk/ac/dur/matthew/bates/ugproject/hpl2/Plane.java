@@ -1,5 +1,6 @@
 package uk.ac.dur.matthew.bates.ugproject.hpl2;
 
+
 public class Plane extends Primitive
 {
 	private boolean active = true;
@@ -205,4 +206,5 @@ public class Plane extends Primitive
 		s += "WorldPos=\"" + getWorldPos()[0] + " " + getWorldPos()[1] + " " + getWorldPos()[2] + "\" />";
 		return s;
 	}
+
 }

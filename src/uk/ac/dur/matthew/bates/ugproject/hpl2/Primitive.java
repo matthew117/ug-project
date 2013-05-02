@@ -73,6 +73,11 @@ public class Primitive
 	{
 		this.rotation = rotation;
 	}
+	
+	public void setRotation(float x, float y, float z)
+	{
+		setRotation(new float[]{x,y,z});
+	}
 
 	public float[] getScale()
 	{
@@ -92,6 +97,11 @@ public class Primitive
 	public void setWorldPos(float[] worldPos)
 	{
 		this.worldPos = worldPos;
+	}
+	
+	public void setWorldPos(float x, float y, float z)
+	{
+		setWorldPos(new float[]{x,y,z});
 	}
 
 }
